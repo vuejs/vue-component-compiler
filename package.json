@@ -1,0 +1,25 @@
+{
+  "name": "vue-component-compiler",
+  "version": "1.0.0",
+  "description": "Compiler for single file Vue components",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vuejs/vue-component-compiler"
+  },
+  "keywords": [
+    "vue",
+    "component"
+  ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuejs/vue-component-compiler/issues"
+  },
+  "homepage": "https://github.com/vuejs/vue-component-compiler",
+  "dependencies": {
+    "clean-css": "^2.2.16",
+    "html-minifier": "^0.6.8",
+    "parse5": "^1.1.4"
+  }
+}
