@@ -61,7 +61,9 @@ exports.compile = function (content, cb) {
     output += script + '\n'
   }
 
-  output += 'module.exports.template = __vue_template__;\n'
+  if (template) {
+    output += 'module.exports.template = __vue_template__;\n'
+  }
   cb(null, output)
 }
 
