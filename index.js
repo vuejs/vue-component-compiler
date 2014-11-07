@@ -82,7 +82,7 @@ function checkLang (node) {
 // Work around changes in parse5 >= 1.2.0
 function serializeTemplate (node) {
   var childNode = node.childNodes[0]
-  if (childNode && childNode.nodeName == '#document-fragment') {
+  if (childNode && childNode.nodeName === '#document-fragment') {
     return serializer.serialize(childNode)
   }
   return serializer.serialize(node)
