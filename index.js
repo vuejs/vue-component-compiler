@@ -26,7 +26,7 @@ exports.compile = function (content, cb) {
         }
         break
       case 'template':
-        template = serializer.serialize(node)
+        template = serializeTemplate(node)
         if (checkLang(node) === 'jade') {
           template = require('./compilers/jade')(template)
         }
@@ -77,4 +77,13 @@ function checkLang (node) {
       }
     }
   }
+}
+
+// Work around changes in parse5 >= 1.2.0
+function serializeTemplate (node) {
+  var childNode = node.childNodes[0]
+  if (childNode && childNode.nodeName == '#document-fragment') {
+    return serializer.serialize(childNode)
+  }
+  return serializer.serialize(node)
 }
