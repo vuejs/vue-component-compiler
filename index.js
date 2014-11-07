@@ -32,7 +32,7 @@ exports.compile = function (content, cb) {
         }
         break
       case 'script':
-        script = serializer.serialize(node)
+        script = serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
           script = require('./compilers/coffee')(script)
         }

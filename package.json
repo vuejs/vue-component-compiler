@@ -16,10 +16,21 @@
   "bugs": {
     "url": "https://github.com/vuejs/vue-component-compiler/issues"
   },
+  "scripts": {
+    "test": "jasmine-node test"
+  },
   "homepage": "https://github.com/vuejs/vue-component-compiler",
   "dependencies": {
     "clean-css": "^2.2.16",
     "html-minifier": "^0.6.8",
     "parse5": "^1.1.4"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "jade": "^1.7.0",
+    "jasmine-node": "^2.0.0-beta4",
+    "less": "^1.7.5",
+    "node-sass": "^1.2.2",
+    "stylus": "^0.49.3"
   }
 }
