@@ -1,10 +1,10 @@
 var jade = require('jade')
 
-module.exports = function (raw) {
+module.exports = function (raw, cb) {
   try {
     var html = jade.compile(raw)({})
-  } catch (e) {
-    console.warn('jade compilation error:\n  ' + e.toString())
+  } catch (err) {
+    return cb(err)
   }
-  return html
+  cb(null, html)
 }

@@ -3,6 +3,7 @@ var cssMinifier = new require('clean-css')()
 var parse5 = require('parse5')
 var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
+var async = require('async')
 
 exports.compile = function (content, cb) {
 
@@ -10,6 +11,7 @@ exports.compile = function (content, cb) {
   var style
   var template
   var output = ''
+  var jobs = []
 
   var fragment = parser.parseFragment(content)
   fragment.childNodes.forEach(function (node) {
@@ -17,54 +19,73 @@ exports.compile = function (content, cb) {
       case 'style':
         style = serializer.serialize(node)
         var lang = checkLang(node)
-        if (lang === 'stylus') {
-          style = require('./compilers/stylus')(style)
-        } else if (lang === 'less') {
-          style = require('./compilers/less')(style)
-        } else if (lang === 'sass' || lang === 'scss') {
-          style = require('./compilers/sass')(style)
+        if (lang === 'scss') {
+          lang = 'sass'
         }
+        if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
+          break
+        }
+        jobs.push(function (cb) {
+          require('./compilers/' + lang)(style, function (err, res) {
+            style = res
+            cb(err)
+          })
+        })
         break
       case 'template':
         template = serializeTemplate(node)
         if (checkLang(node) === 'jade') {
-          template = require('./compilers/jade')(template)
+          jobs.push(function (cb) {
+            require('./compilers/jade')(template, function (err, res) {
+              template = res
+              cb(err)
+            })
+          })
         }
         break
       case 'script':
         script = serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
-          script = require('./compilers/coffee')(script)
+          jobs.push(function (cb) {
+            require('./compilers/coffee')(script, function (err, res) {
+              script = res
+              cb(err)
+            })
+          })
         }
         break
     }
   })
 
-  // style
-  if (style) {
-    style = cssMinifier.minify(style)
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, "\\n")
-    output += 'require("insert-css")("' + style + '");\n'
-  }
+  async.parallel(jobs, function (err) {
+    if (err) return cb(err)
+    // style
+    if (style) {
+      style = cssMinifier.minify(style)
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, "\\n")
+      output += 'require("insert-css")("' + style + '");\n'
+    }
 
-  // template
-  if (template) {
-    template = htmlMinifier.minify(template)
-      .replace(/"/g, '\\"')
-      .replace(/\n/g, "\\n")
-    output += 'var __vue_template__ = "' + template + '";\n'
-  }
+    // template
+    if (template) {
+      template = htmlMinifier.minify(template)
+        .replace(/"/g, '\\"')
+        .replace(/\n/g, "\\n")
+      output += 'var __vue_template__ = "' + template + '";\n'
+    }
 
-  // js
-  if (script) {
-    output += script + '\n'
-  }
+    // js
+    if (script) {
+      output += script + '\n'
+    }
 
-  if (template) {
-    output += 'module.exports.template = __vue_template__;\n'
-  }
-  cb(null, output)
+    if (template) {
+      output += 'module.exports.template = __vue_template__;\n'
+    }
+
+    cb(null, output)
+  })
 }
 
 function checkLang (node) {

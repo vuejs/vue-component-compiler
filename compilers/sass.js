@@ -1,15 +1,16 @@
 var sass = require('node-sass')
 
-module.exports = function (raw) {
-  try {
-    var css = sass.renderSync({
-      data: raw,
-      options: {
-        sourceComments: 'normal'
-      }
-    })
-  } catch (e) {
-    console.warn('sass compilation error:\n  ' + e.toString())
-  }
-  return css
+module.exports = function (raw, cb) {
+  sass.render({
+    data: raw,
+    options: {
+      sourceComments: 'normal'
+    },
+    success: function (css) {
+      cb(null, css)
+    },
+    error: function (err) {
+      cb(err)
+    }
+  })
 }

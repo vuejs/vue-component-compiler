@@ -1,15 +1,12 @@
 var coffee = require('coffee-script')
 
-module.exports = function (raw) {
+module.exports = function (raw, cb) {
   try {
     var js = coffee.compile(raw, {
       bare: true
     })
-  } catch (e) {
-    console.warn(
-      'coffee-script compilation error:\n  ' +
-      e.toString()
-    )
+  } catch (err) {
+    return cb(err)
   }
-  return js
+  cb(null, js)
 }

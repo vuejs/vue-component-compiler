@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/vuejs/vue-component-compiler",
   "dependencies": {
+    "async": "^0.9.0",
     "clean-css": "^2.2.16",
     "html-minifier": "^0.6.8",
     "parse5": "^1.1.4"
