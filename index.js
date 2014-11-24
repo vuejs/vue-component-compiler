@@ -1,3 +1,5 @@
+var fs = require('fs')
+var path = require('path')
 var htmlMinifier = require("html-minifier")
 var cssMinifier = new require('clean-css')()
 var parse5 = require('parse5')
@@ -22,18 +24,36 @@ exports.compile = function (content, cb) {
         if (lang === 'scss') {
           lang = 'sass'
         }
+        var src = checkSrc(node)
+        if(src){
+           try{
+		   	 style = fs.readFileSync(path.join(__dirname,src)).toString()
+		   } catch(e){
+			 throw new Error(e)
+		   }
+        }
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
         }
-        jobs.push(function (done) {
-          require('./compilers/' + lang)(style, function (err, res) {
-            style = res
-            done(err)
-          })
-        })
+        if(lang){
+	        jobs.push(function (done) {
+	          require('./compilers/' + lang)(style, function (err, res) {
+	            style = res
+	            done(err)
+	          })
+	        })
+    	}
         break
       case 'template':
         template = serializeTemplate(node)
+        var src = checkSrc(node)
+        if(src){
+           try{
+		     template = fs.readFileSync(path.join(__dirname,src)).toString()
+		   } catch(e){
+ 			 throw new Error(e)
+		   }
+        }
         if (checkLang(node) === 'jade') {
           jobs.push(function (done) {
             require('./compilers/jade')(template, function (err, res) {
@@ -45,6 +65,14 @@ exports.compile = function (content, cb) {
         break
       case 'script':
         script = serializer.serialize(node).trim()
+        var src = checkSrc(node)
+        if(src){
+       	   try{
+		     script = fs.readFileSync(path.join(__dirname,src)).toString()
+		   } catch(e){
+			 throw new Error(e)
+		   }
+        }
         if (checkLang(node) === 'coffee') {
           jobs.push(function (done) {
             require('./compilers/coffee')(script, function (err, res) {
@@ -94,6 +122,18 @@ function checkLang (node) {
     while (i--) {
       var attr = node.attrs[i]
       if (attr.name === 'lang') {
+        return attr.value
+      }
+    }
+  }
+}
+
+function checkSrc (node) {
+  if (node.attrs) {
+    var i = node.attrs.length
+    while (i--) {
+      var attr = node.attrs[i]
+      if (attr.name === 'src') {
         return attr.value
       }
     }
