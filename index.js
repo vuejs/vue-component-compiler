@@ -25,20 +25,20 @@ exports.compile = function (content, cb) {
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
         }
-        jobs.push(function (cb) {
+        jobs.push(function (done) {
           require('./compilers/' + lang)(style, function (err, res) {
             style = res
-            cb(err)
+            done(err)
           })
         })
         break
       case 'template':
         template = serializeTemplate(node)
         if (checkLang(node) === 'jade') {
-          jobs.push(function (cb) {
+          jobs.push(function (done) {
             require('./compilers/jade')(template, function (err, res) {
               template = res
-              cb(err)
+              done(err)
             })
           })
         }
@@ -46,10 +46,10 @@ exports.compile = function (content, cb) {
       case 'script':
         script = serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
-          jobs.push(function (cb) {
+          jobs.push(function (done) {
             require('./compilers/coffee')(script, function (err, res) {
               script = res
-              cb(err)
+              done(err)
             })
           })
         }
