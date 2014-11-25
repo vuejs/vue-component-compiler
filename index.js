@@ -19,18 +19,10 @@ exports.compile = function (content, cb) {
   fragment.childNodes.forEach(function (node) {
     switch (node.nodeName) {
       case 'style':
-        style = serializer.serialize(node)
+        style = checkSrc(node) || serializer.serialize(node)
         var lang = checkLang(node)
         if (lang === 'scss') {
           lang = 'sass'
-        }
-        var src = checkSrc(node)
-        if(src){
-           try{
-             style = fs.readFileSync(path.join(process.cwd(),src)).toString()
-           } catch(e){
-             throw new Error(e)
-           }
         }
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
@@ -45,15 +37,7 @@ exports.compile = function (content, cb) {
        }
         break
       case 'template':
-        template = serializeTemplate(node)
-        var src = checkSrc(node)
-        if(src){
-           try{
-             template = fs.readFileSync(path.join(process.cwd(),src)).toString()
-           } catch(e){
-             throw new Error(e)
-          }
-        }
+        template = checkSrc(node) || serializeTemplate(node)
         if (checkLang(node) === 'jade') {
           jobs.push(function (cb) {
             require('./compilers/jade')(template, function (err, res) {
@@ -64,15 +48,7 @@ exports.compile = function (content, cb) {
         }
         break
       case 'script':
-        script = serializer.serialize(node).trim()
-        var src = checkSrc(node)
-        if(src){
-          try{
-            script = fs.readFileSync(path.join(process.cwd(),src)).toString()
-           } catch(e){
-          throw new Error(e)
-         }
-        }
+        script = checkSrc(node) || serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
           jobs.push(function (cb) {
             require('./compilers/coffee')(script, function (err, res) {
@@ -134,7 +110,14 @@ function checkSrc (node) {
     while (i--) {
       var attr = node.attrs[i]
       if (attr.name === 'src') {
-        return attr.value
+        var src = attr.name
+        if (src) {
+           try {
+             return fs.readFileSync(path.join(process.cwd(),src)).toString()
+           } catch (e) {
+             throw new Error(e)
+           }
+        }
       }
     }
   }
