@@ -110,7 +110,7 @@ function checkSrc (node) {
     while (i--) {
       var attr = node.attrs[i]
       if (attr.name === 'src') {
-        var src = attr.name
+        var src = attr.value
         if (src) {
            try {
              return fs.readFileSync(path.join(process.cwd(),src)).toString()
