@@ -39,7 +39,7 @@ exports.compile = function (content, cb) {
 	  jobs.push(function (cb) {
 	    require('./compilers/' + lang)(style, function (err, res) {
 	      style = res
-	        done(err)
+	        cb(err)
 	      })
 	  })
     	}
