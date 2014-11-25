@@ -27,8 +27,8 @@ exports.compile = function (content, cb) {
         var src = checkSrc(node)
         if(src){
            try{
-	     style = fs.readFileSync(path.join(__dirname,src)).toString()
-	   } catch(e){
+             style = fs.readFileSync(path.join(__dirname,src)).toString()
+           } catch(e){
              throw new Error(e)
            }
         }
@@ -36,23 +36,23 @@ exports.compile = function (content, cb) {
           break
         }
         if(lang){
-	  jobs.push(function (cb) {
-	    require('./compilers/' + lang)(style, function (err, res) {
-	      style = res
-	        cb(err)
-	      })
-	  })
-    	}
+        jobs.push(function (cb) {
+              require('./compilers/' + lang)(style, function (err, res) {
+              style = res
+              cb(err)
+              })
+          })
+        }
         break
       case 'template':
         template = serializeTemplate(node)
         var src = checkSrc(node)
         if(src){
            try{
-	     template = fs.readFileSync(path.join(__dirname,src)).toString()
+             template = fs.readFileSync(path.join(__dirname,src)).toString()
            } catch(e){
- 	     throw new Error(e)
-  	   }
+             throw new Error(e)
+           }
         }
         if (checkLang(node) === 'jade') {
           jobs.push(function (cb) {
@@ -67,11 +67,11 @@ exports.compile = function (content, cb) {
         script = serializer.serialize(node).trim()
         var src = checkSrc(node)
         if(src){
-       	   try{
-	     script = fs.readFileSync(path.join(__dirname,src)).toString()
+           try{
+             script = fs.readFileSync(path.join(__dirname,src)).toString()
            } catch(e){
- 	     throw new Error(e)
-	   }
+             throw new Error(e)
+           }
         }
         if (checkLang(node) === 'coffee') {
           jobs.push(function (cb) {
