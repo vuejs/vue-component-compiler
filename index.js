@@ -1,3 +1,5 @@
+var fs = require('fs')
+var path = require('path')
 var htmlMinifier = require("html-minifier")
 var cssMinifier = new require('clean-css')()
 var parse5 = require('parse5')
@@ -17,7 +19,7 @@ exports.compile = function (content, cb) {
   fragment.childNodes.forEach(function (node) {
     switch (node.nodeName) {
       case 'style':
-        style = serializer.serialize(node)
+        style = checkSrc(node) || serializer.serialize(node)
         var lang = checkLang(node)
         if (lang === 'scss') {
           lang = 'sass'
@@ -25,15 +27,17 @@ exports.compile = function (content, cb) {
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
         }
-        jobs.push(function (cb) {
-          require('./compilers/' + lang)(style, function (err, res) {
-            style = res
-            cb(err)
+        if(lang){
+          jobs.push(function (cb) {
+            require('./compilers/' + lang)(style, function (err, res) {
+              style = res
+              cb(err)
+            })
           })
-        })
+       }
         break
       case 'template':
-        template = serializeTemplate(node)
+        template = checkSrc(node) || serializeTemplate(node)
         if (checkLang(node) === 'jade') {
           jobs.push(function (cb) {
             require('./compilers/jade')(template, function (err, res) {
@@ -44,7 +48,7 @@ exports.compile = function (content, cb) {
         }
         break
       case 'script':
-        script = serializer.serialize(node).trim()
+        script = checkSrc(node) || serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
           jobs.push(function (cb) {
             require('./compilers/coffee')(script, function (err, res) {
@@ -95,6 +99,25 @@ function checkLang (node) {
       var attr = node.attrs[i]
       if (attr.name === 'lang') {
         return attr.value
+      }
+    }
+  }
+}
+
+function checkSrc (node) {
+  if (node.attrs) {
+    var i = node.attrs.length
+    while (i--) {
+      var attr = node.attrs[i]
+      if (attr.name === 'src') {
+        var src = attr.value
+        if (src) {
+           try {
+             return fs.readFileSync(path.join(process.cwd(),src)).toString()
+           } catch (e) {
+             throw new Error(e)
+           }
+        }
       }
     }
   }
