@@ -27,21 +27,21 @@ exports.compile = function (content, cb) {
         var src = checkSrc(node)
         if(src){
            try{
-		   	 style = fs.readFileSync(path.join(__dirname,src)).toString()
-		   } catch(e){
-			 throw new Error(e)
-		   }
+	     style = fs.readFileSync(path.join(__dirname,src)).toString()
+	   } catch(e){
+             throw new Error(e)
+           }
         }
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
         }
         if(lang){
-	        jobs.push(function (done) {
-	          require('./compilers/' + lang)(style, function (err, res) {
-	            style = res
-	            done(err)
-	          })
-	        })
+	  jobs.push(function (cb) {
+	    require('./compilers/' + lang)(style, function (err, res) {
+	      style = res
+	        done(err)
+	      })
+	  })
     	}
         break
       case 'template':
@@ -49,16 +49,16 @@ exports.compile = function (content, cb) {
         var src = checkSrc(node)
         if(src){
            try{
-		     template = fs.readFileSync(path.join(__dirname,src)).toString()
-		   } catch(e){
- 			 throw new Error(e)
-		   }
+	     template = fs.readFileSync(path.join(__dirname,src)).toString()
+           } catch(e){
+ 	     throw new Error(e)
+  	   }
         }
         if (checkLang(node) === 'jade') {
-          jobs.push(function (done) {
+          jobs.push(function (cb) {
             require('./compilers/jade')(template, function (err, res) {
               template = res
-              done(err)
+              cb(err)
             })
           })
         }
@@ -68,16 +68,16 @@ exports.compile = function (content, cb) {
         var src = checkSrc(node)
         if(src){
        	   try{
-		     script = fs.readFileSync(path.join(__dirname,src)).toString()
-		   } catch(e){
-			 throw new Error(e)
-		   }
+	     script = fs.readFileSync(path.join(__dirname,src)).toString()
+           } catch(e){
+ 	     throw new Error(e)
+	   }
         }
         if (checkLang(node) === 'coffee') {
-          jobs.push(function (done) {
+          jobs.push(function (cb) {
             require('./compilers/coffee')(script, function (err, res) {
               script = res
-              done(err)
+              cb(err)
             })
           })
         }
