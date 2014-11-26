@@ -27,14 +27,12 @@ exports.compile = function (content, cb) {
         if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
           break
         }
-        if(lang){
-          jobs.push(function (cb) {
-            require('./compilers/' + lang)(style, function (err, res) {
-              style = res
-              cb(err)
-            })
+        jobs.push(function (cb) {
+          require('./compilers/' + lang)(style, function (err, res) {
+            style = res
+            cb(err)
           })
-       }
+        })
         break
       case 'template':
         template = checkSrc(node) || serializeTemplate(node)
