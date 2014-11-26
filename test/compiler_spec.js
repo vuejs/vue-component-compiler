@@ -25,5 +25,6 @@ describe('Vue component compiler', function () {
   test('less')
   test('sass')
   test('multiple')
+  test('src')
 
 })

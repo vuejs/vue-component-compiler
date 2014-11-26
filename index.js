@@ -110,11 +110,11 @@ function checkSrc (node) {
       if (attr.name === 'src') {
         var src = attr.value
         if (src) {
-           try {
-             return fs.readFileSync(path.join(process.cwd(),src)).toString()
-           } catch (e) {
-             throw new Error(e)
-           }
+          try {
+            return fs.readFileSync(path.join(process.cwd(), src)).toString()
+          } catch (e) {
+            throw new Error(e)
+          }
         }
       }
     }
