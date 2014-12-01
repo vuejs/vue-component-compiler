@@ -47,11 +47,21 @@ module.exports =
 </script>
 ```
 
+And you can import using the `src` attribute:
+
+``` html
+<style lang="stylus" src="style.styl"></style>
+<template src="template.html"></template>
+<script src="./scripts/main.js"></script>
+```
+
 ## Usage
 
 ``` js
 var compiler = require('vue-component-compiler')
-compiler.compile(fileContent, function (err, result) {
+// filePath should be an absolute path, and is optional if
+// the fileContent doesn't contain src imports
+compiler.compile(fileContent, filePath, function (err, result) {
   // result is a common js module string
 })
 ```
