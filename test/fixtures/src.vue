@@ -1,3 +1,3 @@
-<template src="test/fixtures/test.html"></template>
-<style src="test/fixtures/test.styl" lang="stylus"></style>
-<script src="test/fixtures/test.js"></script>
+<template src="test.html"></template>
+<style src="./test.styl" lang="stylus"></style>
+<script src="./src/test.js"></script>

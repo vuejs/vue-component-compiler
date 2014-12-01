@@ -7,7 +7,12 @@ var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
 var async = require('async')
 
-exports.compile = function (content, cb) {
+exports.compile = function (content, filePath, cb) {
+  // path is optional
+  if (typeof filePath === 'function') {
+    cb = filePath
+    filePath = process.cwd()
+  }
 
   var script
   var style
@@ -19,7 +24,7 @@ exports.compile = function (content, cb) {
   fragment.childNodes.forEach(function (node) {
     switch (node.nodeName) {
       case 'style':
-        style = checkSrc(node) || serializer.serialize(node)
+        style = checkSrc(node, filePath) || serializer.serialize(node)
         var lang = checkLang(node)
         if (lang === 'scss') {
           lang = 'sass'
@@ -35,7 +40,7 @@ exports.compile = function (content, cb) {
         })
         break
       case 'template':
-        template = checkSrc(node) || serializeTemplate(node)
+        template = checkSrc(node, filePath) || serializeTemplate(node)
         if (checkLang(node) === 'jade') {
           jobs.push(function (cb) {
             require('./compilers/jade')(template, function (err, res) {
@@ -46,7 +51,7 @@ exports.compile = function (content, cb) {
         }
         break
       case 'script':
-        script = checkSrc(node) || serializer.serialize(node).trim()
+        script = checkSrc(node, filePath) || serializer.serialize(node).trim()
         if (checkLang(node) === 'coffee') {
           jobs.push(function (cb) {
             require('./compilers/coffee')(script, function (err, res) {
@@ -102,7 +107,8 @@ function checkLang (node) {
   }
 }
 
-function checkSrc (node) {
+function checkSrc (node, filePath) {
+  var dir = path.dirname(filePath)
   if (node.attrs) {
     var i = node.attrs.length
     while (i--) {
@@ -111,9 +117,12 @@ function checkSrc (node) {
         var src = attr.value
         if (src) {
           try {
-            return fs.readFileSync(path.join(process.cwd(), src)).toString()
+            return fs.readFileSync(path.resolve(dir, src), 'utf-8')
           } catch (e) {
-            throw new Error(e)
+            console.warn(
+              'Failed to load src: "' + src +
+              '" from file: "' + filePath + '"'
+            )
           }
         }
       }

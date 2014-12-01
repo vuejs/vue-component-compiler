@@ -8,13 +8,18 @@ function read (file) {
 
 function test (name) {
   it(name, function (done) {
-    var file = read('fixtures/' + name + '.vue')
+    var filePath = 'fixtures/' + name + '.vue'
+    var fileContent = read(filePath)
     var expected = read('expects/' + name + '.js')
-    compiler.compile(file, function (err, result) {
-      expect(!err).toBe(true)
-      expect(result).toEqual(expected)
-      done()
-    })
+    compiler.compile(
+      fileContent,
+      path.resolve(__dirname, filePath),
+      function (err, result) {
+        expect(!err).toBe(true)
+        expect(result).toEqual(expected)
+        done()
+      }
+    )
   })
 }
 
