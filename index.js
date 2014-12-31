@@ -29,7 +29,7 @@ exports.compile = function (content, filePath, cb) {
         if (lang === 'scss') {
           lang = 'sass'
         }
-        if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus') {
+        if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus' && lang != 'myth') {
           break
         }
         jobs.push(function (cb) {
