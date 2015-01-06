@@ -32,5 +32,6 @@ describe('Vue component compiler', function () {
   test('myth')
   test('multiple')
   test('src')
+  test('es6')
 
 })

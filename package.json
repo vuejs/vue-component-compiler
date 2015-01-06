@@ -27,12 +27,13 @@
     "parse5": "^1.1.4"
   },
   "devDependencies": {
+    "6to5": "^2.6.3",
     "coffee-script": "^1.8.0",
     "jade": "^1.7.0",
     "jasmine-node": "^2.0.0-beta4",
     "less": "^1.7.5",
+    "myth": "^1.2.0",
     "node-sass": "^1.2.2",
-    "stylus": "^0.49.3",
-    "myth": "^1.2.0"
+    "stylus": "^0.49.3"
   }
 }
