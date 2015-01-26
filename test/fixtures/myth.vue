@@ -5,11 +5,11 @@
 }
 
 a {
-  transition: color .2s;
   color: var(--purple);
 }
 
 pre {
   padding: var(--large);
+  margin: calc(var(--large) * 2);
 }
 </style>
