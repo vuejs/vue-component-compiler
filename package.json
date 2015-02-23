@@ -27,6 +27,7 @@
     "parse5": "^1.1.4"
   },
   "devDependencies": {
+    "babel": "^4.4.5",
     "coffee-script": "^1.9.1",
     "jade": "^1.9.2",
     "less": "^2.4.0",

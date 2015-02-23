@@ -1,8 +1,8 @@
-var to5 = require('6to5')
+var babel = require('babel')
 
 module.exports = function (raw, cb) {
   try {
-    var res = to5.transform(raw)
+    var res = babel.transform(raw)
   } catch (err) {
     return cb(err)
   }

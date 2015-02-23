@@ -5,7 +5,7 @@ var odds = evens.map(function (v) {
   return v + 1;
 });
 module.exports = {
-  data: function () {
+  data: function data() {
     return odds;
   }
 };
