@@ -6,8 +6,8 @@ module.exports = function (raw, cb) {
     options: {
       sourceComments: 'normal'
     },
-    success: function (css) {
-      cb(null, css)
+    success: function (res) {
+      cb(null, res.css)
     },
     error: function (err) {
       cb(err)

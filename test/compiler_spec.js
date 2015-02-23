@@ -1,6 +1,7 @@
 var fs = require('fs')
 var path = require('path')
 var compiler = require('../index')
+var assert = require('assert')
 
 function read (file) {
   return fs.readFileSync(path.resolve(__dirname, file), 'utf-8')
@@ -15,8 +16,8 @@ function test (name) {
       fileContent,
       path.resolve(__dirname, filePath),
       function (err, result) {
-        expect(!err).toBe(true)
-        expect(result).toEqual(expected)
+        assert(!err)
+        assert.equal(result, expected)
         done()
       }
     )
