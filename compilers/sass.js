@@ -7,7 +7,11 @@ module.exports = function (raw, cb) {
       sourceComments: 'normal'
     },
     success: function (res) {
-      cb(null, res.css)
+      if (typeof res === 'object') {
+        cb(null, res.css)
+      } else {
+        cb(null, css) // compat for node-sass < 2.0.0
+      }
     },
     error: function (err) {
       cb(err)
