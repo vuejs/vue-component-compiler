@@ -4,6 +4,18 @@
 
 This module compile a single file Vue component like the one below into a CommonJS module that can be used in Browserify/Webpack/Component/Duo builds.
 
+Currently supported preprocessors are:
+
+- stylus
+- less
+- scss (via `node-sass`)
+- jade
+- coffee-script
+- myth
+- es6 (via `6to5` aka `babel`)
+
+## Example
+
 ``` html
 // app.vue
 <style>
@@ -55,7 +67,7 @@ And you can import using the `src` attribute:
 <script src="./scripts/main.js"></script>
 ```
 
-## Usage
+## API
 
 ``` js
 var compiler = require('vue-component-compiler')
