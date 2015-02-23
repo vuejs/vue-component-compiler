@@ -52,9 +52,10 @@ exports.compile = function (content, filePath, cb) {
         break
       case 'script':
         script = checkSrc(node, filePath) || serializer.serialize(node).trim()
-        if (checkLang(node) === 'coffee') {
+        var lang = checkLang(node)
+        if (lang === 'coffee' || lang === 'es6') {
           jobs.push(function (cb) {
-            require('./compilers/coffee')(script, function (err, res) {
+            require('./compilers/' + lang)(script, function (err, res) {
               script = res
               cb(err)
             })
