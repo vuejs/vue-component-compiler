@@ -7,6 +7,22 @@ var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
 var async = require('async')
 
+var scriptLangs = [
+  'coffee',
+  'es6'
+]
+
+var styleLangs = [
+  'less',
+  'sass',
+  'stylus',
+  'myth'
+]
+
+var templateLangs = [
+  'jade'
+]
+
 exports.compile = function (content, filePath, cb) {
   // path is optional
   if (typeof filePath === 'function') {
@@ -29,7 +45,7 @@ exports.compile = function (content, filePath, cb) {
         if (lang === 'scss') {
           lang = 'sass'
         }
-        if (lang !== 'less' && lang !== 'sass' && lang !== 'stylus' && lang != 'myth') {
+        if (styleLangs.indexOf(lang) < 0) {
           break
         }
         jobs.push(function (cb) {
@@ -41,26 +57,29 @@ exports.compile = function (content, filePath, cb) {
         break
       case 'template':
         template = checkSrc(node, filePath) || serializeTemplate(node)
-        if (checkLang(node) === 'jade') {
-          jobs.push(function (cb) {
-            require('./compilers/jade')(template, function (err, res) {
-              template = res
-              cb(err)
-            })
-          })
+        var lang = checkLang(node)
+        if (templateLangs.indexOf(lang) < 0) {
+          break
         }
+        jobs.push(function (cb) {
+          require('./compilers/' + lang)(template, function (err, res) {
+            template = res
+            cb(err)
+          })
+        })
         break
       case 'script':
         script = checkSrc(node, filePath) || serializer.serialize(node).trim()
         var lang = checkLang(node)
-        if (lang === 'coffee' || lang === 'es6') {
-          jobs.push(function (cb) {
-            require('./compilers/' + lang)(script, function (err, res) {
-              script = res
-              cb(err)
-            })
-          })
+        if (scriptLangs.indexOf(lang) < 0) {
+          break
         }
+        jobs.push(function (cb) {
+          require('./compilers/' + lang)(script, function (err, res) {
+            script = res
+            cb(err)
+          })
+        })
         break
     }
   })
