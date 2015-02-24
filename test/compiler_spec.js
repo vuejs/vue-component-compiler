@@ -25,15 +25,8 @@ function test (name) {
 }
 
 describe('Vue component compiler', function () {
-
-  test('basic')
-  test('empty')
-  test('less')
-  test('sass')
-  test('myth')
-  test('jade')
-  test('multiple')
-  test('src')
-  test('es6')
-
+  fs.readdirSync(path.resolve(__dirname, 'expects'))
+    .forEach(function (file) {
+      test(path.basename(file, '.js'))
+    })
 })

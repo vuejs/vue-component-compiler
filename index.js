@@ -30,31 +30,17 @@ exports.compile = function (content, filePath, cb) {
     filePath = process.cwd()
   }
 
-  var script
-  var style
+  // only 1 template tag is allowed, while styles and
+  // scripts are concatenated.
   var template
+  var script = ''
+  var style = ''
   var output = ''
   var jobs = []
 
   var fragment = parser.parseFragment(content)
   fragment.childNodes.forEach(function (node) {
     switch (node.nodeName) {
-      case 'style':
-        style = checkSrc(node, filePath) || serializer.serialize(node)
-        var lang = checkLang(node)
-        if (lang === 'scss') {
-          lang = 'sass'
-        }
-        if (styleLangs.indexOf(lang) < 0) {
-          break
-        }
-        jobs.push(function (cb) {
-          require('./compilers/' + lang)(style, function (err, res) {
-            style = res
-            cb(err)
-          })
-        })
-        break
       case 'template':
         template = checkSrc(node, filePath) || serializeTemplate(node)
         var lang = checkLang(node)
@@ -68,15 +54,33 @@ exports.compile = function (content, filePath, cb) {
           })
         })
         break
-      case 'script':
-        script = checkSrc(node, filePath) || serializer.serialize(node).trim()
+      case 'style':
+        var rawStyle = checkSrc(node, filePath) || serializer.serialize(node)
         var lang = checkLang(node)
-        if (scriptLangs.indexOf(lang) < 0) {
+        if (lang === 'scss') {
+          lang = 'sass'
+        }
+        if (styleLangs.indexOf(lang) < 0) {
+          style += rawStyle
           break
         }
         jobs.push(function (cb) {
-          require('./compilers/' + lang)(script, function (err, res) {
-            script = res
+          require('./compilers/' + lang)(rawStyle, function (err, res) {
+            style += res
+            cb(err)
+          })
+        })
+        break
+      case 'script':
+        var rawScript = checkSrc(node, filePath) || serializer.serialize(node).trim()
+        var lang = checkLang(node)
+        if (scriptLangs.indexOf(lang) < 0) {
+          script += (script ? '\n' : '') + rawScript
+          break
+        }
+        jobs.push(function (cb) {
+          require('./compilers/' + lang)(rawScript, function (err, res) {
+            script += (script ? '\n' : '') + res
             cb(err)
           })
         })
