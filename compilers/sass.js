@@ -10,7 +10,7 @@ module.exports = function (raw, cb) {
       if (typeof res === 'object') {
         cb(null, res.css)
       } else {
-        cb(null, css) // compat for node-sass < 2.0.0
+        cb(null, res) // compat for node-sass < 2.0.0
       }
     },
     error: function (err) {
