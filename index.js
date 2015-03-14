@@ -44,8 +44,7 @@ exports.compile = function (content, filePath, cb) {
     switch (node.nodeName) {
       case 'template':
         template = checkSrc(node, filePath) || serializeTemplate(node)
-        htmlMinifyOption = checkMinify(node)
-        htmlMinifyOption = htmlMinifyOption ? JSON.parse(htmlMinifyOption) : {}
+        htmlMinifyOption = JSON.parse(checkMinify(node) || '{}')
         var lang = checkLang(node)
         if (templateLangs.indexOf(lang) < 0) {
           break
