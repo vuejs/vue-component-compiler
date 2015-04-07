@@ -9,7 +9,8 @@ var async = require('async')
 
 var scriptLangs = [
   'coffee',
-  'es6'
+  'es6',
+  'live'
 ]
 
 var styleLangs = [
