@@ -13,6 +13,7 @@ Currently supported preprocessors are:
 - coffee-script
 - myth
 - es6 (via `6to5` aka `babel`)
+- LiveScript
 
 ## Example
 
