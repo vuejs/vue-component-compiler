@@ -82,7 +82,7 @@ compiler.compile(fileContent, filePath, function (err, result) {
 
 ## Registering Custom Pre-Processors
 
-Create a `vue.config.js` file at where your build command is run from (usually y the root level of your project):
+Create a `vue.config.js` file at where your build command is run (usually y the root level of your project):
 
 ``` js
 module.exports = function (compiler) {
