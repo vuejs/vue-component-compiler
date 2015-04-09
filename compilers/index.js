@@ -35,8 +35,8 @@ if (fs.existsSync(configPath)) {
  *                 - compile {Function}
  */
 function registerCompiler (opts) {
-  if (!opts.extension) {
-    return warn('missing file extension')
+  if (!opts.lang) {
+    return warn('missing language')
   }
   if (!opts.type) {
     return warn('missing file type')
@@ -54,5 +54,8 @@ function registerCompiler (opts) {
 }
 
 function warn (msg) {
-  console.warn('[vue-component-compiler] ' + msg);
+  console.warn(
+    '[vue-component-compiler] Error attempting to' +
+    'register custom compiler: ' + msg
+  )
 }

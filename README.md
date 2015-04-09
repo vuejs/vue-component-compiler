@@ -14,6 +14,8 @@ Currently supported preprocessors are:
 - myth
 - es6 (via `6to5` aka `babel`)
 
+Also see [Registering Custom Pre-Processors](#user-content-registering-custom-pre-processors).
+
 ## Example
 
 ``` html
@@ -76,4 +78,24 @@ var compiler = require('vue-component-compiler')
 compiler.compile(fileContent, filePath, function (err, result) {
   // result is a common js module string
 })
+```
+
+## Registering Custom Pre-Processors
+
+Create a `vue.config.js` file at where your build command is run from (usually y the root level of your project):
+
+``` js
+module.exports = function (compiler) {
+  
+  // register a compile function for <script lang="es">
+  compiler.register({
+    lang: 'es',
+    type: 'script',
+    compile: function (content, cb) {
+      // transform the content...
+      cb(null, content)
+    }
+  })
+
+}
 ```
