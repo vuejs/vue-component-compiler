@@ -1,6 +1,6 @@
 {
   "name": "vue-component-compiler",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Compiler for single file Vue components",
   "main": "index.js",
   "repository": {
