@@ -6,23 +6,15 @@ var parse5 = require('parse5')
 var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
 var async = require('async')
+var compilers = require('./compilers')
 
-var scriptLangs = [
-  'coffee',
-  'es6'
-]
-
-var styleLangs = [
-  'less',
-  'sass',
-  'stylus',
-  'myth'
-]
-
-var templateLangs = [
-  'jade'
-]
-
+/**
+ * Compile a .vue file.
+ *
+ * @param {String} content
+ * @param {String} [filePath]
+ * @param {Function} cb
+ */
 exports.compile = function (content, filePath, cb) {
   // path is optional
   if (typeof filePath === 'function') {
@@ -38,48 +30,59 @@ exports.compile = function (content, filePath, cb) {
   var output = ''
   var jobs = []
 
+  // parse the file into an HTML tree
   var fragment = parser.parseFragment(content)
+
+  // Walk through the top level nodes and check for their
+  // types & languages. If there are pre-processing needed,
+  // push it into a jobs list.
   fragment.childNodes.forEach(function (node) {
     switch (node.nodeName) {
+
+      // Tempalte
       case 'template':
         template = checkSrc(node, filePath) || serializeTemplate(node)
         var lang = checkLang(node)
-        if (templateLangs.indexOf(lang) < 0) {
+        var compiler = compilers.template[lang]
+        if (!compiler) {
           break
         }
         jobs.push(function (cb) {
-          require('./compilers/' + lang)(template, function (err, res) {
+          compiler(template, function (err, res) {
             template = res
             cb(err)
           })
         })
         break
+
+      // Style
       case 'style':
         var rawStyle = checkSrc(node, filePath) || serializer.serialize(node)
         var lang = checkLang(node)
-        if (lang === 'scss') {
-          lang = 'sass'
-        }
-        if (styleLangs.indexOf(lang) < 0) {
+        var compiler = compilers.style[lang]
+        if (!compiler) {
           style += rawStyle
           break
         }
         jobs.push(function (cb) {
-          require('./compilers/' + lang)(rawStyle, function (err, res) {
+          compiler(rawStyle, function (err, res) {
             style += res
             cb(err)
           })
         })
         break
+
+      // Script
       case 'script':
         var rawScript = checkSrc(node, filePath) || serializer.serialize(node).trim()
         var lang = checkLang(node)
-        if (scriptLangs.indexOf(lang) < 0) {
+        var compiler = compilers.script[lang]
+        if (!compiler) {
           script += (script ? '\n' : '') + rawScript
           break
         }
         jobs.push(function (cb) {
-          require('./compilers/' + lang)(rawScript, function (err, res) {
+          compiler(rawScript, function (err, res) {
             script += (script ? '\n' : '') + res
             cb(err)
           })
@@ -87,7 +90,8 @@ exports.compile = function (content, filePath, cb) {
         break
     }
   })
-
+  
+  // process all pre-processing jobs in parallel
   async.parallel(jobs, function (err) {
     if (err) return cb(err)
     // style
@@ -119,6 +123,12 @@ exports.compile = function (content, filePath, cb) {
   })
 }
 
+/**
+ * Check the lang attribute of a parse5 node.
+ *
+ * @param {Node} node
+ * @return {String|undefined}
+ */
 function checkLang (node) {
   if (node.attrs) {
     var i = node.attrs.length
@@ -131,6 +141,15 @@ function checkLang (node) {
   }
 }
 
+/**
+ * Check src import for a node, relative to the filePath if
+ * available. Using readFileSync for now since this is a
+ * rare use case.
+ *
+ * @param {Node} node
+ * @param {String} filePath
+ * @return {String}
+ */
 function checkSrc (node, filePath) {
   var dir = path.dirname(filePath)
   if (node.attrs) {

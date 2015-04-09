@@ -7,6 +7,6 @@ b = x(function() {
 
 "use strict";
 
-var p = function (x) {
+var p = function p(x) {
   return x || 5;
 };
