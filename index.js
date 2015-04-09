@@ -10,6 +10,7 @@ var compilers = require('./compilers')
 
 // expose method for registering custom pre-processors
 exports.register = compilers.register
+exports.loadConfig = compilers.loadConfig
 
 /**
  * Compile a .vue file.

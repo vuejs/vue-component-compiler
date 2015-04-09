@@ -44,13 +44,15 @@ compilers.register = function registerCompiler (opts) {
 }
 
 // check for config file
-var fs = require('fs')
-var path = require('path')
-var configPath = path.resolve(process.cwd(), 'vue.config.js')
-if (fs.existsSync(configPath)) {
-  require(configPath)({
-    register: compiler.register
-  })
+compilers.loadConfig = function () {
+  var fs = require('fs')
+  var path = require('path')
+  var configPath = path.resolve(process.cwd(), 'vue.config.js')
+  if (fs.existsSync(configPath)) {
+    require(configPath)({
+      register: compilers.register
+    })
+  }
 }
 
 function warn (msg) {
