@@ -3,6 +3,16 @@ var path = require('path')
 var compiler = require('../index')
 var assert = require('assert')
 
+// test custom transform
+compiler.register({
+  lang: 'test',
+  type: 'script',
+  compile: function (content, cb) {
+    content = content.replace('not ', '')
+    cb(null, content)
+  }
+})
+
 function read (file) {
   return fs.readFileSync(path.resolve(__dirname, file), 'utf-8')
 }

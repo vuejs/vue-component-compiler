@@ -16,25 +16,15 @@ var compilers = module.exports = {
   }
 }
 
-// check for config file
-var fs = require('fs')
-var path = require('path')
-var configPath = path.resolve(process.cwd(), 'vue.config.js')
-if (fs.existsSync(configPath)) {
-  require(configPath)({
-    register: registerCompiler
-  })
-}
-
 /**
- * Register a compiler for a given file extension.
+ * Register a custom pre-processor for a given language.
  *
  * @param {Object} opts
- *                 - extension {String}
+ *                 - lang {String}
  *                 - type {String}
  *                 - compile {Function}
  */
-function registerCompiler (opts) {
+compilers.register = function registerCompiler (opts) {
   if (!opts.lang) {
     return warn('missing language')
   }
@@ -50,7 +40,17 @@ function registerCompiler (opts) {
       ' (valid types: script|style|template)'
     )
   }
-  compilers[opts.type][opts.extension] = opts.compile
+  compilers[opts.type][opts.lang] = opts.compile
+}
+
+// check for config file
+var fs = require('fs')
+var path = require('path')
+var configPath = path.resolve(process.cwd(), 'vue.config.js')
+if (fs.existsSync(configPath)) {
+  require(configPath)({
+    register: compiler.register
+  })
 }
 
 function warn (msg) {

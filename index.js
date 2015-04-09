@@ -8,6 +8,9 @@ var serializer = new parse5.TreeSerializer()
 var async = require('async')
 var compilers = require('./compilers')
 
+// expose method for registering custom pre-processors
+exports.register = compilers.register
+
 /**
  * Compile a .vue file.
  *
