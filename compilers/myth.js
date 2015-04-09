@@ -1,6 +1,9 @@
-var myth = require('myth')
-
 module.exports = function (raw, cb) {
+  try {
+    var myth = require('myth')
+  } catch (err) {
+    return cb(err)
+  }
   try {
     var css = myth(raw)
   } catch (err) {

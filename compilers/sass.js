@@ -1,6 +1,9 @@
-var sass = require('node-sass')
-
 module.exports = function (raw, cb) {
+  try {
+    var sass = require('node-sass')
+  } catch (err) {
+    return cb(err)
+  }
   sass.render({
     data: raw,
     options: {
