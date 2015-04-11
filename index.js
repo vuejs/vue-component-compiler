@@ -101,6 +101,7 @@ exports.compile = function (content, filePath, cb) {
     // style
     if (style) {
       style = cssMinifier.minify(style)
+        .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n")
       output += 'require("insert-css")("' + style + '");\n'
@@ -109,6 +110,7 @@ exports.compile = function (content, filePath, cb) {
     // template
     if (template) {
       template = htmlMinifier.minify(template)
+        .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n")
       output += 'var __vue_template__ = "' + template + '";\n'
