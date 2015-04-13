@@ -120,7 +120,11 @@ exports.compile = function (content, filePath, cb) {
     }
 
     if (template) {
-      output += 'module.exports.template = __vue_template__;\n'
+      output +=
+        ';(typeof module.exports === "function"' +
+          '? module.exports.options' +
+          ': module.exports)' +
+        '.template = __vue_template__;\n'
     }
 
     cb(null, output)
