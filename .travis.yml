@@ -10,4 +10,7 @@ before_install:
   - sudo g++ --version;
   - sudo apt-get update -qq;
 node_js:
-- '0.10'
+  - "0.10"
+  - "0.11"
+  - "0.12"
+  - "iojs"
