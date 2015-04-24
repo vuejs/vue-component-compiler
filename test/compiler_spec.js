@@ -22,12 +22,32 @@ function test (name) {
     var filePath = 'fixtures/' + name + '.vue'
     var fileContent = read(filePath)
     var expected = read('expects/' + name + '.js')
+
+    // test src imports registering dependency
+    var addDep
+    var deps
+    if (name === 'src') {
+      deps = []
+      addDep = function (file) {
+        deps.push(file)
+      }
+      compiler.on('dependency', addDep)
+    }
+
     compiler.compile(
       fileContent,
       path.resolve(__dirname, filePath),
       function (err, result) {
         assert(!err)
         assert.equal(result, expected)
+
+        if (name === 'src') {
+          compiler.removeListener('dependency', addDep)
+          assert.equal(deps[0], __dirname + '/fixtures/test.html')
+          assert.equal(deps[1], __dirname + '/fixtures/test.styl')
+          assert.equal(deps[2], __dirname + '/fixtures/src/test.js')
+        }
+        
         done()
       }
     )

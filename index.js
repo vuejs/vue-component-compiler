@@ -7,10 +7,13 @@ var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
 var async = require('async')
 var compilers = require('./compilers')
+var Emitter = require('events').EventEmitter
+
+var compiler = module.exports = new Emitter()
 
 // expose method for registering custom pre-processors
-exports.register = compilers.register
-exports.loadConfig = compilers.loadConfig
+compiler.register = compilers.register
+compiler.loadConfig = compilers.loadConfig
 
 /**
  * Compile a .vue file.
@@ -19,7 +22,7 @@ exports.loadConfig = compilers.loadConfig
  * @param {String} [filePath]
  * @param {Function} cb
  */
-exports.compile = function (content, filePath, cb) {
+compiler.compile = function (content, filePath, cb) {
   // path is optional
   if (typeof filePath === 'function') {
     cb = filePath
@@ -167,8 +170,10 @@ function checkSrc (node, filePath) {
       if (attr.name === 'src') {
         var src = attr.value
         if (src) {
+          var filePath = path.resolve(dir, src)
+          compiler.emit('dependency', filePath)
           try {
-            return fs.readFileSync(path.resolve(dir, src), 'utf-8')
+            return fs.readFileSync(filePath, 'utf-8')
           } catch (e) {
             console.warn(
               'Failed to load src: "' + src +
