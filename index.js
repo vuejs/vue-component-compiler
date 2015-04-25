@@ -32,6 +32,7 @@ compiler.compile = function (content, filePath, cb) {
   // only 1 template tag is allowed, while styles and
   // scripts are concatenated.
   var template
+  var htmlMinifyOption
   var script = ''
   var style = ''
   var output = ''
@@ -49,6 +50,7 @@ compiler.compile = function (content, filePath, cb) {
       // Tempalte
       case 'template':
         template = checkSrc(node, filePath) || serializeTemplate(node)
+        htmlMinifyOption = JSON.parse(checkMinify(node) || '{}')
         var lang = checkLang(node)
         var compiler = compilers.template[lang]
         if (!compiler) {
@@ -111,7 +113,7 @@ compiler.compile = function (content, filePath, cb) {
 
     // template
     if (template) {
-      template = htmlMinifier.minify(template)
+      template = htmlMinifier.minify(template, htmlMinifyOption)
         .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n")
       output += 'var __vue_template__ = "' + template + '";\n'
@@ -181,6 +183,18 @@ function checkSrc (node, filePath) {
             )
           }
         }
+      }
+    }
+  }
+}
+
+function checkMinify (node) {
+  if (node.attrs) {
+    var i = node.attrs.length
+    while (i--) {
+      var attr = node.attrs[i]
+      if (attr.name === 'minify') {
+        return attr.value
       }
     }
   }
