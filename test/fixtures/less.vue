@@ -12,5 +12,6 @@
   color: saturate(@base, 5%);
   border-color: lighten(@base, 30%);
   div { .box-shadow(0 0 5px, 30%) }
+  &:before { content: '\f101' }
 }
 </style>
