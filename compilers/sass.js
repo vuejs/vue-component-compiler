@@ -19,5 +19,10 @@ module.exports = function (raw, cb) {
     error: function (err) {
       cb(err)
     }
+  },
+  // callback for node-sass > 3.0.0
+  function (err, res) {
+    if (err) return err
+    cb(null, res.css.toString())
   })
 }
