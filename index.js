@@ -10,6 +10,11 @@ var async = require('async')
 var compilers = require('./compilers')
 var Emitter = require('events').EventEmitter
 
+// required for Vue 1.0 shorthand syntax
+var htmlMinifyOptions = {
+  customAttrSurround: [[/@/, new RegExp('')], [/:/, new RegExp('')]]
+}
+
 var compiler = module.exports = new Emitter()
 
 // expose method for registering custom pre-processors
@@ -110,7 +115,7 @@ compiler.compile = function (content, filePath, cb) {
 
     // template
     if (template) {
-      template = JSON.stringify(htmlMinifier.minify(template))
+      template = JSON.stringify(htmlMinifier.minify(template, htmlMinifyOptions))
       output += 'var __vue_template__ = ' + template + ';\n'
     }
 

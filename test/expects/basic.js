@@ -1,5 +1,5 @@
 require("insert-css")("html{font-size:20px}");
-var __vue_template__ = "<h1>hello</h1>";
+var __vue_template__ = "<h1 :id=\"id\" @click=\"hi\">hello</h1>";
 var a = 123
 module.exports = {
   data: function () {

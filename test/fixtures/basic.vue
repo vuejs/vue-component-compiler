@@ -5,7 +5,7 @@
 </style>
 
 <template>
-  <h1>hello</h1>
+  <h1 :id="id" @click="hi">hello</h1>
 </template>
 
 <script>
