@@ -1,7 +1,8 @@
 var fs = require('fs')
 var path = require('path')
 var htmlMinifier = require("html-minifier")
-var cssMinifier = new require('clean-css')()
+var CleanCSS = require('clean-css')
+var cssMinifier = new CleanCSS()
 var parse5 = require('parse5')
 var parser = new parse5.Parser()
 var serializer = new parse5.TreeSerializer()
@@ -103,7 +104,7 @@ compiler.compile = function (content, filePath, cb) {
     if (err) return cb(err)
     // style
     if (style) {
-      style = JSON.stringify(cssMinifier.minify(style))
+      style = JSON.stringify(cssMinifier.minify(style).styles)
       output += 'require("insert-css")(' + style + ');\n'
     }
 
