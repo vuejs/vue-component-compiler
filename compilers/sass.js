@@ -22,7 +22,10 @@ module.exports = function (raw, cb) {
   },
   // callback for node-sass > 3.0.0
   function (err, res) {
-    if (err) return err
-    cb(null, res.css.toString())
+    if (err) {
+      cb(err)
+    } else {
+      cb(null, res.css.toString())
+    }
   })
 }
