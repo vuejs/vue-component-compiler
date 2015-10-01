@@ -1,6 +1,6 @@
 # vue-component-compiler
 
-[![npm version](https://badge.fury.io/js/vue-component-compiler.svg)](http://badge.fury.io/js/vue-component-compiler) [![Build Status](https://travis-ci.org/vuejs/vue-component-compiler.svg?branch=master)](https://travis-ci.org/vuejs/vue-component-compiler)
+[![npm version](https://badge.fury.io/js/vue-component-compiler.svg)](http://badge.fury.io/js/vue-component-compiler) [![Build Status](https://circleci.com/gh/vuejs/vue-component-compiler.svg?style=shield)](https://circleci.com/gh/vuejs/vue-component-compiler)
 
 This module compile a single file Vue component like the one below into a CommonJS module that can be used in Browserify/Webpack/Component/Duo builds.
 
