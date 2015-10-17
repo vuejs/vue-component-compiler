@@ -1,4 +1,8 @@
-# vue-component-compiler
+# DEPRECATED
+
+This module has been merged into [vueify](https://github.com/vuejs/vueify).
+
+## vue-component-compiler
 
 [![npm version](https://badge.fury.io/js/vue-component-compiler.svg)](http://badge.fury.io/js/vue-component-compiler) [![Build Status](https://circleci.com/gh/vuejs/vue-component-compiler.svg?style=shield)](https://circleci.com/gh/vuejs/vue-component-compiler)
 
