@@ -34,6 +34,10 @@ function test (name) {
       compiler.on('dependency', addDep)
     }
 
+    process.env.NODE_ENV = name === 'non-minified'
+      ? 'development'
+      : 'production'
+
     compiler.compile(
       fileContent,
       path.resolve(__dirname, filePath),

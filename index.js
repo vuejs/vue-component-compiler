@@ -8,7 +8,7 @@ var compilers = require('./compilers')
 var Emitter = require('events').EventEmitter
 
 if (process.env.NODE_ENV === 'production') {
-  var htmlMinifier = require("html-minifier")
+  var htmlMinifier = require('html-minifier')
   var CleanCSS = require('clean-css')
   var cssMinifier = new CleanCSS()
 }
@@ -113,17 +113,17 @@ compiler.compile = function (content, filePath, cb) {
     // style
     if (style) {
       if (process.env.NODE_ENV === 'production') {
-        style = JSON.stringify(cssMinifier.minify(style).styles)
+        style = cssMinifier.minify(style).styles
       }
-      output += 'require("insert-css")(' + style + ');\n'
+      output += 'require("insert-css")(' + JSON.stringify(style) + ');\n'
     }
 
     // template
     if (template) {
       if (process.env.NODE_ENV === 'production') {
-        template = JSON.stringify(htmlMinifier.minify(template, htmlMinifyOptions))
+        template = htmlMinifier.minify(template, htmlMinifyOptions)
       }
-      output += 'var __vue_template__ = ' + template + ';\n'
+      output += 'var __vue_template__ = ' + JSON.stringify(template) + ';\n'
     }
 
     // js
