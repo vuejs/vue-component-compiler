@@ -1,0 +1,24 @@
+{
+  "name": "vue-component-compiler",
+  "version": "3.0.0",
+  "description": "bundler agnostic API for compiling Vue SFC",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuejs/vue-component-compiler.git"
+  },
+  "keywords": [
+    "vue",
+    "compiler",
+    "sfc"
+  ],
+  "author": "Evan You",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vuejs/vue-component-compiler/issues"
+  },
+  "homepage": "https://github.com/vuejs/vue-component-compiler#readme"
+}
