@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/vuejs/vue-component-compiler/issues"
   },
-  "homepage": "https://github.com/vuejs/vue-component-compiler#readme"
+  "homepage": "https://github.com/vuejs/vue-component-compiler#readme",
+  "devDependencies": {
+    "jest": "^21.1.0"
+  }
 }
