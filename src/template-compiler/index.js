@@ -16,6 +16,7 @@ module.exports = function compileTemplate (template, filename, config) {
     errors: compiled.errors,
     tips: compiled.tips
   }
+  const vueHotReloadAPI = (config.require && config.require.vueHotReloadAPI) || 'vue-hot-reload-api'
 
   if (output.errors && output.errors.length) {
     output.code = config.esModule !== false
@@ -48,7 +49,7 @@ module.exports = function compileTemplate (template, filename, config) {
         '\nif (module.hot) {\n' +
         '  module.hot.accept()\n' +
         '  if (module.hot.data) {\n' +
-        `     require('vue-hot-reload-api').rerender('${options.scopeId}', module.exports)\n` +
+        `     require(${JSON.stringify(vueHotReloadAPI)}).rerender(${JSON.stringify(options.scopeId)}, module.exports)\n` +
         '  }\n' +
         '}'
     }
@@ -61,8 +62,4 @@ function toFunction (code) {
   return 'function () {' + beautify(code, {
     indent_size: 2 // eslint-disable-line camelcase
   }) + '}'
-}
-
-function pad (html) {
-  return html.split(/\r?\n/).map(line => `  ${line}`).join('\n')
 }
