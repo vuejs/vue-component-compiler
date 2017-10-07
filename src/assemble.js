@@ -1,26 +1,11 @@
-const defaultsDeep = require('lodash.defaultsdeep')
+const defaults = require('lodash.defaultsdeep')
+const hash = require('hash-sum')
+
+const genId = require('./gen-id')
 
 const DISPOSED = 'disposed'
 const INJECT_STYLE_FN = 'injectStyle'
 const CSS_MODULES = 'cssModules'
-
-const defaultConfig = {
-  esModule: true,
-  filename: null,
-  shortFilePath: null,
-  require: {
-    vueHotReloadAPI: 'vue-hot-reload-api',
-    normalizeComponent: 'vue-component-compiler/src/normalize-component.js'
-  },
-  moduleId: null, // css scope id.
-  moduleIdentifier: null, // require for server.
-  isHot: false,
-  isServer: false,
-  isProduction: true,
-  isInjectable: false,
-  hasStyleInjectFn: false,
-  onWarn () {}
-}
 
 function _s (any) {
   return JSON.stringify(any)
@@ -41,12 +26,28 @@ function __vue_type__ (type, id, esModule, addPrefix = true) {
   return output
 }
 
-module.exports = function assemble (script, render, styles, customBlocks, config) {
+module.exports = function assemble (source, filename, config) {
+  config = defaults(config, {
+    esModule: true,
+    shortFilePath: filename,
+    require: {
+      vueHotReloadAPI: 'vue-hot-reload-api',
+      normalizeComponent: 'vue-component-compiler/src/normalize-component.js'
+    },
+    moduleId: null,
+    moduleIdentifier: config.moduleIdentifier || hash(_s({ filename, config })), // require for server. TODO: verify this is correct.
+    isHot: false,
+    isServer: false,
+    isProduction: true,
+    isInjectable: false,
+    hasStyleInjectFn: false,
+    onWarn: message => console.warn(message)
+  })
+
   let output = ''
+  const { script, render, styles, customBlocks } = source
   const needsHotReload = !config.isProduction && config.isHot
   const hasScoped = styles.some(style => style.descriptor.scoped)
-
-  config = defaultsDeep({}, config, defaultConfig)
 
   if (config.isInjectable) config.esModule = false
 
@@ -96,7 +97,7 @@ module.exports = function assemble (script, render, styles, customBlocks, config
               `  var oldLocals = ${CSS_MODULES}[${MODULE_KEY}]\n` +
               `  if (!oldLocals) return\n` +
               // 2. re-import (side effect: updates the <style>)
-              `  var newLocals = ${style.code}\n` +
+              `  var newLocals = ${requireString}\n` +
               // 3. compare new and old locals to see if selectors changed
               `  if (JSON.stringify(newLocals) === JSON.stringify(oldLocals)) return\n` +
               // 4. locals changed. Update and force re-render.
@@ -166,11 +167,11 @@ module.exports = function assemble (script, render, styles, customBlocks, config
         'console.error("named exports are not supported in *.vue files.")' +
       '}\n'
     // check functional components used with templates
-    if (render.code) {
+    if (render.id) {
       output +=
         'if (Component.options.functional) {' +
           'console.error("' +
-          '[vue-loader] ' + config.filename + ': functional components are not ' +
+          '[vue-loader] ' + filename + ': functional components are not ' +
           'supported with templates, they should use render functions.' +
         '")}\n'
     }

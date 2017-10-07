@@ -1,15 +1,36 @@
 const compiler = require('vue-template-compiler')
 const transpile = require('vue-template-es2015-compiler')
+const defaults = require('lodash.defaultsdeep')
 const { js_beautify: beautify } = require('js-beautify')
 
 const transformRequire = require('./modules/transform-require')
 
 module.exports = function compileTemplate (template, filename, config) {
-  const options = Object.assign({
-    preserveWhitespace: true
-  }, config.options, {
-    modules: [transformRequire(config.transformToRequire)].concat(config.plugins || [])
-  })
+  config = defaults(
+    config,
+    {
+      isHot: false,
+      isServer: false,
+      isProduction: true,
+      optimizeSSR: true,
+      buble: {
+        transforms: {
+          stripWith: true
+        }
+      },
+      options: {
+        preserveWhitespace: true,
+        modules: []
+      },
+      plugins: []
+    }
+  )
+
+  const options = config.options
+
+  options.modules = options.modules.concat(config.plugins)
+  options.modules.push(transformRequire(config.transformToRequire))
+
   const compile = (config.isServer && config.optimizeSSR !== false && compiler.ssrCompile) ? compiler.ssrCompile : compiler.compile
   const compiled = compile(template.code, options)
   const output = {
@@ -31,11 +52,9 @@ module.exports = function compileTemplate (template, filename, config) {
 
     // mark with stripped (this enables Vue to use correct runtime proxy detection)
     if (
-      !config.isProduction && (
-      !config.buble ||
-      !config.buble.transforms ||
+      !config.isProduction &&
       config.buble.transforms.stripWith !== false
-    )) {
+    ) {
       output.code += `render._withStripped = true\n`
     }
 

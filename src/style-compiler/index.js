@@ -1,25 +1,18 @@
 const postcss = require('postcss')
+const defaults = require('lodash.defaultsdeep')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
 
-/**
- * Compile SFC style.
- *
- * @param {CompilerSource} style
- * @param {string} filename
- * @param {{plugins: object, options: object, needMap: boolean}} config
- */
-function compileStyle (style, filename, config = {}) {
-  const plugins = [trim].concat(config.plugins || [])
+function compileStyle (style, filename, config) {
+  const plugins = [trim].concat(config.plugins)
   const options = Object.assign({
     to: filename,
-    from: filename,
-    map: false
+    from: filename
   }, config.options)
 
   // source map
-  if (config.needMap && !options.map) {
+  if (config.needMap && !style.map) {
     if (!style.map) {
       throw Error('Previous source map is missing.')
     }
@@ -43,17 +36,23 @@ function compileStyle (style, filename, config = {}) {
     plugins.push(scopeId({ id: config.scopeId }))
   }
 
-  return postcss(plugins).process(style.code, options)
+  return postcss(plugins).process(style.code, options).then(result => {
+    const output = { code: result.css }
+
+    if (config.needMap) { output.map = result.map }
+    result.warnings().forEach(warning => config.onWarn(warning))
+
+    return output
+  })
 }
 
-module.exports =
-/**
- * Compile SFC styles.
- *
- * @param {CompilerSource[]} styles
- * @param {string} filename
- * @param {{plugins: object, options: object, needMap: boolean}} config
- */
-function compileStyles (styles, filename, config) {
+module.exports = function compileStyles (styles, filename, config) {
+  config = defaults(config, {
+    needMap: true,
+    plugins: [],
+    options: {},
+    onWarn: message => console.warn(message)
+  })
+
   return Promise.all(styles.map(style => compileStyle(style, filename, config)))
 }

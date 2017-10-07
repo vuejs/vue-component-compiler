@@ -1,4 +1,5 @@
 const compiler = require('vue-template-compiler')
+const defaults = require('lodash.defaultsdeep')
 const LRU = require('lru-cache')
 const hash = require('hash-sum')
 const { SourceMapGenerator } = require('source-map')
@@ -7,14 +8,16 @@ const cache = LRU(100)
 const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
-module.exports = function (content, filename, needMap) {
+module.exports = function (content, filename, config) {
+  config = defaults(config, { needMap: true })
+
   const cacheKey = hash(filename + content)
   const filenameWithHash = filename + '?' + cacheKey // source-map cache busting for hot-reloadded modules
 
   if (cache.has(cacheKey)) return cache.get(cacheKey)
 
   const output = compiler.parseComponent(content, { pad: 'line' })
-  if (needMap) {
+  if (config.needMap) {
     if (output.script && !output.script.src) {
       output.script.map = generateSourceMap(
         filenameWithHash,
