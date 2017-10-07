@@ -10,7 +10,7 @@ test('generated map should match to correct position in original source', () => 
     <script>
     export default {}
     </script>
-    `, 'foo.vue', true)
+    `, 'foo.vue')
   const consumer = new SourceMapConsumer(descriptor.script.map)
   const position = consumer.originalPositionFor({ line: 6, column: 0 })
 
@@ -19,7 +19,7 @@ test('generated map should match to correct position in original source', () => 
 })
 
 test('should not generate source map', () => {
-  const descriptor = parser(`<script>export default {}</script>`, 'foo.vue')
+  const descriptor = parser(`<script>export default {}</script>`, 'foo.vue', { needMap: false })
 
   expect(descriptor.script.map).toBeUndefined()
 })

@@ -11,6 +11,7 @@ module.exports = function compileTemplate (template, filename, config) {
     {
       isHot: false,
       isServer: false,
+      esModule: true,
       isProduction: true,
       optimizeSSR: true,
       buble: {
@@ -40,7 +41,7 @@ module.exports = function compileTemplate (template, filename, config) {
   const vueHotReloadAPI = (config.require && config.require.vueHotReloadAPI) || 'vue-hot-reload-api'
 
   if (output.errors && output.errors.length) {
-    output.code = config.esModule !== false
+    output.code = config.esModule === true
       ? `export function render () {}\nexport var staticRenderFns = []`
       : 'module.exports={render:function(){},staticRenderFns:[]}'
   } else {
@@ -59,7 +60,7 @@ module.exports = function compileTemplate (template, filename, config) {
     }
 
     const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
-    output.code += config.esModule !== false
+    output.code += config.esModule === true
       ? `export default ${__exports__}`
       : `module.exports = ${__exports__}`
 

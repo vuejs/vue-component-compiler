@@ -4,7 +4,7 @@ test('should compile template to esModule', async () => {
   const template = {
     code: '<div>{{foo}}</div>\n'
   }
-  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx' })
+  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx', isProduction: false })
 
   expect(compiled.code.indexOf('export default')).toBeGreaterThan(-1)
   expect(compiled.code.indexOf('render._withStripped')).toBeGreaterThan(-1)
@@ -15,7 +15,7 @@ test('should compile template to node module', async () => {
   const template = {
     code: '<div>{{foo}}</div>\n'
   }
-  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx', esModule: false })
+  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx', esModule: false, isProduction: false })
 
   expect(compiled.code.indexOf('export default')).toBe(-1)
   expect(compiled.code.indexOf('render._withStripped')).toBeGreaterThan(-1)
@@ -26,7 +26,7 @@ test('should compile with HMR', async () => {
   const template = {
     code: '<div>{{foo}}</div>\n'
   }
-  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx', isHot: true })
+  const compiled = await compiler(template, 'foo.vue', { scopeId: 'xxx', isHot: true, isProduction: false })
 
   expect(compiled.code.indexOf('module.hot.accept')).toBeGreaterThan(-1)
 })
