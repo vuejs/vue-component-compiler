@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Install yarn if required
-          command: if ! type yarn > /dev/null; then; curl -o- -s -L https://yarnpkg.com/install.sh | bash; fi
+          command: curl -o- -s -L https://yarnpkg.com/install.sh | bash
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
