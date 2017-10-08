@@ -2,7 +2,7 @@
   "name": "vue-component-compiler",
   "version": "3.0.0",
   "description": "bundler agnostic API for compiling Vue SFC",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "jest",
     "lint": "eslint src test",
@@ -22,6 +22,7 @@
   "bugs": {
     "url": "https://github.com/vuejs/vue-component-compiler/issues"
   },
+  "typings": "index.d.ts",
   "homepage": "https://github.com/vuejs/vue-component-compiler#readme",
   "devDependencies": {
     "eslint": "^3.19.0",
