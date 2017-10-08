@@ -53,18 +53,27 @@ module.exports = function assemble (source, filename, config) {
 
   let cssModules
   if (styles.length) {
-    let styleInjectionCode = `function ${INJECT_STYLE_FN} (ssrContext) {\n`
+    let styleInjectionCode = ''
 
-    if (needsHotReload) styleInjectionCode += `if (${DISPOSED}) return`
-    if (config.isServer) styleInjectionCode += '  var i\n'
+    if (needsHotReload) styleInjectionCode += `if (${DISPOSED}) return\n`
 
     styles.forEach((style, i) => {
-      const invokeStyle = config.isServer && config.hasStyleInjectFn
-        ? code => `  ;i=${code},i.__inject__&&i.__inject__(ssrContext),i)\n`
-        : code => `  ${code}\n`
-
+      const IMPORT_NAME = `__vue_style_${i}__`
+      const IMPORT_STRING = _s(style.id)
       const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
-      const requireString = `require(${_s(style.id)})`
+      const needsStyleInjection = config.isServer && config.hasStyleInjectFn
+      const needsNamedImport = needsStyleInjection || typeof moduleName === 'string'
+      const runInjection = needsStyleInjection ? `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(ssrContext)\n` : ''
+
+      if (needsNamedImport) {
+        output += config.esModule
+          ? `import ${IMPORT_NAME} from ${IMPORT_STRING}\n`
+          : `const ${IMPORT_NAME} = requrie(${IMPORT_STRING})\n`
+      } else {
+        output += config.esModule
+          ? `import ${IMPORT_STRING}\n`
+          : `require(${IMPORT_STRING})\n`
+      }
 
       if (moduleName) {
         if (!cssModules) {
@@ -77,16 +86,16 @@ module.exports = function assemble (source, filename, config) {
           config.onWarn({
             message: 'CSS module name "' + moduleName + '" is not unique!'
           })
-          styleInjectionCode += invokeStyle(requireString)
+          styleInjectionCode += runInjection
         } else {
           cssModules[moduleName] = true
           const MODULE_KEY = _s(moduleName)
 
           if (!needsHotReload) {
-            styleInjectionCode += invokeStyle(`this[${MODULE_KEY}] = ${requireString}`)
+            styleInjectionCode += runInjection + `this[${MODULE_KEY}] = ${IMPORT_NAME}\n`
           } else {
-            styleInjectionCode +=
-              invokeStyle(`${CSS_MODULES}[${MODULE_KEY}] = ${requireString}`) +
+            styleInjectionCode += runInjection +
+              `${CSS_MODULES}[${MODULE_KEY}] = ${IMPORT_NAME}\n` +
               `Object.defineProperty(this, ${MODULE_KEY}, { get: function () { return ${CSS_MODULES}[${MODULE_KEY}] }})\n`
 
             output +=
@@ -95,7 +104,7 @@ module.exports = function assemble (source, filename, config) {
               `  var oldLocals = ${CSS_MODULES}[${MODULE_KEY}]\n` +
               `  if (!oldLocals) return\n` +
               // 2. re-import (side effect: updates the <style>)
-              `  var newLocals = ${requireString}\n` +
+              `  var newLocals = require(${IMPORT_STRING})\n` +
               // 3. compare new and old locals to see if selectors changed
               `  if (JSON.stringify(newLocals) === JSON.stringify(oldLocals)) return\n` +
               // 4. locals changed. Update and force re-render.
@@ -105,12 +114,9 @@ module.exports = function assemble (source, filename, config) {
           }
         }
       } else {
-        styleInjectionCode += invokeStyle(requireString)
       }
     })
-
-    styleInjectionCode += '}\n'
-    output += styleInjectionCode
+    output += `function ${INJECT_STYLE_FN} (ssrContext) {\n` + pad(styleInjectionCode) + `}\n`
   }
 
   // we require the component normalizer function, and call it like so:
@@ -242,5 +248,5 @@ module.exports = function assemble (source, filename, config) {
 }
 
 function pad (content) {
-  return content.split('\n').map(line => '  ' + line).join('\n')
+  return content.trim().split('\n').map(line => '  ' + line).join('\n') + '\n'
 }
