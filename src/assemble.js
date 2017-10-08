@@ -177,7 +177,7 @@ module.exports = function assemble (source, filename, config) {
       output +=
         'if (Component.options.functional) {\n' +
         '  console.error("' +
-          '[vue-loader] ' + filename + ': functional components are not ' +
+          '[vue-component-compiler] ' + filename + ': functional components are not ' +
           'supported with templates, they should use render functions.' +
         '")\n}\n'
     }

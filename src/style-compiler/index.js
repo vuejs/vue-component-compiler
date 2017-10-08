@@ -12,7 +12,7 @@ function compileStyle (style, filename, config) {
   }, config.options)
 
   // source map
-  if (config.needMap && !style.map) {
+  if (config.needMap) {
     if (!style.map) {
       throw Error('Previous source map is missing.')
     }
