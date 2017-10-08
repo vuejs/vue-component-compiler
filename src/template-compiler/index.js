@@ -75,7 +75,7 @@ module.exports = function compileTemplate (template, filename, config) {
     }
   }
 
-  return Promise.resolve(output)
+  return output
 }
 
 function toFunction (code) {
