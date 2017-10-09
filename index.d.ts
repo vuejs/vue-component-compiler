@@ -13,7 +13,7 @@ declare module VueComponentCompiler {
    * @param styles List of styles to process.
    * @param file SFC file path
    */
-  export function compileStyles(styles: Array<StyleCompilerSource>, file: string, config: StyleCompilerConfig): Promise<Array<StyleCompilerOutput>>
+  export function compileStyle(style: StyleCompilerSource, file: string, config: StyleCompilerConfig): Promise<Array<StyleCompilerOutput>>
 
   /**
    * Compile template to render functions

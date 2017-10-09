@@ -4,7 +4,15 @@ const defaults = require('lodash.defaultsdeep')
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
 
-function compileStyle (style, filename, config) {
+module.exports = function compileStyle (style, filename, config) {
+  config = defaults(config, {
+    async: false,
+    needMap: true,
+    plugins: [],
+    options: {},
+    onWarn: message => console.warn(message)
+  })
+
   const plugins = [trim].concat(config.plugins)
   const options = Object.assign({
     to: filename,
@@ -47,18 +55,4 @@ function compileStyle (style, filename, config) {
   }
 
   return (config.async) ? output.then(prepare) : prepare(output)
-}
-
-module.exports = function compileStyles (styles, filename, config) {
-  config = defaults(config, {
-    async: false,
-    needMap: true,
-    plugins: [],
-    options: {},
-    onWarn: message => console.warn(message)
-  })
-
-  const results = styles.map(style => compileStyle(style, filename, config))
-
-  return config.async ? Promise.all(results) : results
 }

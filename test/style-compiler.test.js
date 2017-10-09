@@ -7,6 +7,6 @@ test('should rewrite scoped style', () => {
       scoped: true
     }
   }
-  const compiled = compiler([style], 'foo.vue', { scopeId: 'xxx', needMap: false })
-  expect(compiled[0].code.indexOf('.foo[xxx]')).toBeGreaterThan(-1)
+  const compiled = compiler(style, 'foo.vue', { scopeId: 'xxx', needMap: false })
+  expect(compiled.code.indexOf('.foo[xxx]')).toBeGreaterThan(-1)
 })
