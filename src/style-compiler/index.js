@@ -21,10 +21,6 @@ module.exports = function compileStyle (style, filename, config) {
 
   // source map
   if (config.needMap) {
-    if (!style.map) {
-      throw Error('Previous source map is missing.')
-    }
-
     options.map = {
       inline: false,
       annotation: false,
