@@ -1,9 +1,8 @@
 /* globals __VUE_SSR_CONTEXT__ */
 
-// this module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle
+// this module is a runtime utility for cleaner component module output.
 
-module.exports = function normalizeComponent (
+export default function normalizeComponent (
   rawScriptExports,
   compiledTemplate,
   injectStyles,
