@@ -30,7 +30,7 @@ module.exports = function assemble (source, filename, config) {
     shortFilePath: filename,
     require: {
       vueHotReloadAPI: 'vue-hot-reload-api',
-      normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component.js'
+      normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component'
     },
     scopeId: null,
     moduleIdentifier: config.moduleIdentifier || hash(_s({ filename, config })), // require for server. TODO: verify this is correct.
