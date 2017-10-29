@@ -38,6 +38,7 @@
     "lodash.defaultsdeep": "^4.6.0",
     "lru-cache": "^4.1.1",
     "postcss": "^6.0.12",
+    "postcss-modules": "^0.8.0",
     "postcss-selector-parser": "^2.2.3",
     "source-map": "^0.6.1",
     "vue-hot-reload-api": "^2.1.0",
