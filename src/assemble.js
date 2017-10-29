@@ -30,7 +30,7 @@ module.exports = function assemble (source, filename, config) {
     shortFilePath: filename,
     require: {
       vueHotReloadAPI: 'vue-hot-reload-api',
-      normalizeComponent: 'vue-component-compiler/src/normalize-component.js'
+      normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component.js'
     },
     scopeId: null,
     moduleIdentifier: config.moduleIdentifier || hash(_s({ filename, config })), // require for server. TODO: verify this is correct.
@@ -61,14 +61,14 @@ module.exports = function assemble (source, filename, config) {
       const IMPORT_NAME = `__vue_style_${i}__`
       const IMPORT_STRING = _s(style.id)
       const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
-      const needsStyleInjection = config.isServer && config.hasStyleInjectFn
+      const needsStyleInjection = config.hasStyleInjectFn
       const needsNamedImport = needsStyleInjection || typeof moduleName === 'string'
       const runInjection = needsStyleInjection ? `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(ssrContext)\n` : ''
 
       if (needsNamedImport) {
         output += config.esModule
           ? `import ${IMPORT_NAME} from ${IMPORT_STRING}\n`
-          : `const ${IMPORT_NAME} = requrie(${IMPORT_STRING})\n`
+          : `const ${IMPORT_NAME} = require(${IMPORT_STRING})\n`
       } else {
         output += config.esModule
           ? `import ${IMPORT_STRING}\n`
@@ -114,6 +114,7 @@ module.exports = function assemble (source, filename, config) {
           }
         }
       } else {
+        styleInjectionCode += runInjection
       }
     })
     output += `function ${INJECT_STYLE_FN} (ssrContext) {\n` + pad(styleInjectionCode) + `}\n`
