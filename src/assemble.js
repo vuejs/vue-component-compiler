@@ -33,7 +33,7 @@ module.exports = function assemble (source, filename, config) {
       normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component'
     },
     scopeId: null,
-    moduleIdentifier: config.moduleIdentifier || hash(_s({ filename, config })), // require for server. TODO: verify this is correct.
+    moduleIdentifier: null,
     isHot: false,
     isServer: false,
     isProduction: true,
