@@ -1,5 +1,7 @@
 // vue compiler module for transforming `<tag>:<attribute>` to `require`
 const defaultOptions = {
+  video: ['src', 'poster'],
+  source: 'src',
   img: 'src',
   image: 'xlink:href'
 }
