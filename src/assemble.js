@@ -44,8 +44,13 @@ module.exports = function assemble (source, filename, config) {
 
   if (styles.length) {
     const cssModules = {}
-    let inlineInjectFunctionAdded = false
     let styleInjectionCode = ''
+
+    // Import style injector.
+    output += importStatement(
+      config.isServer ? config.require.injectStyleServer : config.require.injectStyleClient,
+      { name: STYLE_INJECTOR_IDENTIFIER, esModule: config.esModule }
+    )
     styles.forEach((style, i) => {
       const IMPORT_NAME = `__vue_style_${i}__`
       const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
@@ -53,13 +58,6 @@ module.exports = function assemble (source, filename, config) {
       const runInjection = `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(context)\n`
 
       if (typeof style.content === 'string') {
-        if (!inlineInjectFunctionAdded) {
-          output += importStatement(
-            config.isServer ? config.require.injectStyleServer : config.require.injectStyleClient,
-            { name: STYLE_INJECTOR_IDENTIFIER, esModule: config.esModule }
-          )
-          inlineInjectFunctionAdded = true
-        }
         output += inlineStyle(IMPORT_NAME, style, config)
         styleInjectionCode += runInjection
       } else {
