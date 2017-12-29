@@ -12,7 +12,7 @@ function inlineStyle (name, style, config) {
   let output = `var ${name} = {}\n` // TODO: Inline css modules if required.
 
   output += `${name}.__inject__ = function (context) {\n` +
-    ` ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, ${_s(style.content)}, ${config.isProduction}, context)\n` +
+    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, ${_s(style.content)}, ${config.isProduction}, context)\n` +
     `}\n`
 
   return output
