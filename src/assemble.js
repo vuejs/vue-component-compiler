@@ -1,26 +1,40 @@
 const defaults = require('lodash.defaultsdeep')
-const hash = require('hash-sum')
+const { js_beautify: beautify } = require('js-beautify')
 
-const DISPOSED = 'disposed'
-const INJECT_STYLE_FN = 'injectStyle'
-const CSS_MODULES = 'cssModules'
+const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
+const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
+const STYLE_IDENTIFIER = '__vue_inject_style__'
+const COMPONENT_IDENTIFIER = '__vue_component__'
 
 function _s (any) {
   return JSON.stringify(any)
 }
 
 // eslint-disable-next-line camelcase
-function __vue_type__ (type, id, esModule, addPrefix = true) {
-  let output = addPrefix ? `\n/* ${type} */\n` : ''
-  if (id) {
-    if (esModule) {
-      output += `import __vue_${type}__ from ${_s(id)}\n`
-    } else {
-      output += `var __vue_${type}__ = require(${_s(id)})\n`
-    }
-  } else {
-    output += `var __vue_${type}__ = null\n`
+function importStatement (id, { type, name, esModule, noIdentifier = false }) {
+  const header = type ? `\n/* ${type} */\n` : ''
+  name = name || `__vue_${type}__`
+
+  if (!id) return header + `var ${name} = null\n`
+
+  if (esModule) {
+    return header + (
+      noIdentifier ? `import ${_s(id)}\n` : `import ${name} from ${_s(id)}\n`
+    )
   }
+
+  return header + (
+    noIdentifier ? `require(${_s(id)})\n` : `var ${name} = require(${_s(id)})\n`
+  )
+}
+
+function inlineStyle (name, style, config) {
+  let output = `var ${name} = {}\n` // TODO: Inline css modules if required.
+
+  output += `${name}.__inject__ = function (context) {\n` +
+    ` ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, ${_s(style.content)}, ${config.isProduction}, context)\n` +
+    `}\n`
+
   return output
 }
 
@@ -29,95 +43,68 @@ module.exports = function assemble (source, filename, config) {
     esModule: true,
     shortFilePath: filename,
     require: {
-      vueHotReloadAPI: 'vue-hot-reload-api',
-      normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component'
+      normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component',
+      injectStyleClient: 'vue-component-compiler/src/runtime/inject-style-client',
+      injectStyleServer: 'vue-component-compiler/src/runtime/inject-style-server'
     },
     scopeId: null,
     moduleIdentifier: null,
-    isHot: false,
     isServer: false,
     isProduction: true,
-    isInjectable: false,
     hasStyleInjectFn: false,
     onWarn: message => console.warn(message)
   })
 
+  // console.log(config)
+  // console.log('-----------------------------')
+
   let output = ''
-  const { script, render, styles, customBlocks } = source
-  const needsHotReload = !config.isProduction && config.isHot
+  const { script = {}, render = {}, styles = [], customBlocks = [] } = source
   const hasScoped = styles.some(style => style.descriptor.scoped)
 
-  if (config.isInjectable) config.esModule = false
-
-  if (needsHotReload) output += `var ${DISPOSED} = false\n`
-
-  let cssModules
   if (styles.length) {
+    const cssModules = {}
+    let inlineInjectFunctionAdded = false
     let styleInjectionCode = ''
-
-    if (needsHotReload) styleInjectionCode += `if (${DISPOSED}) return\n`
-
     styles.forEach((style, i) => {
       const IMPORT_NAME = `__vue_style_${i}__`
-      const IMPORT_STRING = _s(style.id)
       const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
-      const needsStyleInjection = config.hasStyleInjectFn
-      const needsNamedImport = needsStyleInjection || typeof moduleName === 'string'
-      const runInjection = needsStyleInjection ? `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(ssrContext)\n` : ''
+      const needsNamedImport = config.hasStyleInjectFn || typeof moduleName === 'string'
+      const runInjection = `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(context)\n`
 
-      if (needsNamedImport) {
-        output += config.esModule
-          ? `import ${IMPORT_NAME} from ${IMPORT_STRING}\n`
-          : `const ${IMPORT_NAME} = require(${IMPORT_STRING})\n`
+      if (typeof style.content === 'string') {
+        if (!inlineInjectFunctionAdded) {
+          output += importStatement(
+            config.isServer ? config.require.injectStyleServer : config.require.injectStyleClient,
+            { name: STYLE_INJECTOR_IDENTIFIER, esModule: config.esModule }
+          )
+          inlineInjectFunctionAdded = true
+        }
+        output += inlineStyle(IMPORT_NAME, style, config)
+        styleInjectionCode += runInjection
       } else {
-        output += config.esModule
-          ? `import ${IMPORT_STRING}\n`
-          : `require(${IMPORT_STRING})\n`
+        output += importStatement(style.id, {
+          esModule: config.esModule,
+          name: IMPORT_NAME,
+          noIdentifier: !needsNamedImport
+        })
+        if (config.hasStyleInjectFn) {
+          styleInjectionCode += runInjection
+        }
       }
 
       if (moduleName) {
-        if (!cssModules) {
-          cssModules = {}
-          if (needsHotReload) {
-            output += `var ${CSS_MODULES} = {}\n`
-          }
-        }
         if (moduleName in cssModules) {
           config.onWarn({
             message: 'CSS module name "' + moduleName + '" is not unique!'
           })
-          styleInjectionCode += runInjection
         } else {
           cssModules[moduleName] = true
-          const MODULE_KEY = _s(moduleName)
-
-          if (!needsHotReload) {
-            styleInjectionCode += runInjection + `this[${MODULE_KEY}] = ${IMPORT_NAME}\n`
-          } else {
-            styleInjectionCode += runInjection +
-              `${CSS_MODULES}[${MODULE_KEY}] = ${IMPORT_NAME}\n` +
-              `Object.defineProperty(this, ${MODULE_KEY}, { get: function () { return ${CSS_MODULES}[${MODULE_KEY}] }})\n`
-
-            output +=
-              `module.hot && module.hot.accept([${_s(style.hotPath || style.id)}], function () {\n` +
-              // 1. check if style has been injected
-              `  var oldLocals = ${CSS_MODULES}[${MODULE_KEY}]\n` +
-              `  if (!oldLocals) return\n` +
-              // 2. re-import (side effect: updates the <style>)
-              `  var newLocals = require(${IMPORT_STRING})\n` +
-              // 3. compare new and old locals to see if selectors changed
-              `  if (JSON.stringify(newLocals) === JSON.stringify(oldLocals)) return\n` +
-              // 4. locals changed. Update and force re-render.
-              `  ${CSS_MODULES}[${MODULE_KEY}] = newLocals\n` +
-              `  require(${_s(config.require.vueHotReloadAPI)}).rerender(${_s(config.moduleId)})\n` +
-              `})\n`
-          }
+          styleInjectionCode += `this[${_s(moduleName)}] = ${IMPORT_NAME}\n`
         }
-      } else {
-        styleInjectionCode += runInjection
       }
     })
-    output += `function ${INJECT_STYLE_FN} (ssrContext) {\n` + pad(styleInjectionCode) + `}\n`
+    output += `function ${STYLE_IDENTIFIER} (context) {\n` + pad(styleInjectionCode) + `}\n`
   }
 
   // we require the component normalizer function, and call it like so:
@@ -128,22 +115,41 @@ module.exports = function assemble (source, filename, config) {
   //   scopeId,
   //   moduleIdentifier (server only)
   // )
-  output += config.esModule
-    ? `import normalizeComponent from ${_s(config.require.normalizeComponent)}\n`
-    : `var normalizeComponent = require(${_s(config.require.normalizeComponent)})\n`
+  output += importStatement(config.require.normalizeComponent, {
+    esModule: config.esModule,
+    name: NORMALIZE_COMPONENT_IDENTIFIER
+  })
   // <script>
-  output += __vue_type__('script', script.id, config.esModule)
-  if (config.isInjectable) {
-    output +=
-      `if (__vue_script__) { __vue_script__ = __vue_script__(injections) }\n`
+  if (typeof script.content === 'string') {
+    output += '\n/* script */\n' + script.content.replace(/export[\s\r\n]+default/, '\nvar __vue_script__ = ') + '\n'
+  } else {
+    output += importStatement(script.id, {
+      esModule: config.esModule,
+      type: 'script'
+    })
+    if (script.id && config.esModule) {
+      output += `export * from ${_s(script.id)}\n`
+    }
   }
 
   // <template>
-  output += __vue_type__('template', render.id, config.esModule)
+  if (typeof render.content === 'string') {
+    output += `\n/* template */\n` +
+      `var __vue_template__ = (${
+        beautify(render.content, {
+          indent_size: 2 // eslint-disable-line camelcase
+        })
+      })\n`
+  } else {
+    output += importStatement(render.id, {
+      esModule: config.esModule,
+      type: 'template'
+    })
+  }
 
   // style
   output += '\n/* styles */\n'
-  output += 'var __vue_styles__ = ' + (styles.length ? 'injectStyle' : 'null') + '\n'
+  output += 'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
 
   // scopeId
   output += '\n/* scopeId */\n'
@@ -154,7 +160,7 @@ module.exports = function assemble (source, filename, config) {
   output += 'var __vue_module_identifier__ = ' + (config.isServer ? _s(config.moduleIdentifier) : 'null') + '\n'
 
   // close normalizeComponent call
-  output += '\nvar Component = normalizeComponent(\n' +
+  output += `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
   '  __vue_script__,\n' +
   '  __vue_template__,\n' +
   '  __vue_styles__,\n' +
@@ -165,84 +171,25 @@ module.exports = function assemble (source, filename, config) {
   // development-only code
   if (!config.isProduction) {
     // add filename in dev
-    output += `Component.options.__file = ${_s(config.shortFilePath)}\n`
-    // check named exports
-    output +=
-      `if (Component.esModule && Object.keys(Component.esModule).some(function (key) {\n` +
-      `  return key !== "default" && key.substr(0, 2) !== "__"\n` +
-      `})) {\n` +
-      `  console.error("named exports are not supported in *.vue files.")\n` +
-      `}\n`
-    // check functional components used with templates
-    if (render.id) {
-      output +=
-        'if (Component.options.functional) {\n' +
-        '  console.error("' +
-          '[vue-component-compiler] ' + filename + ': functional components are not ' +
-          'supported with templates, they should use render functions.' +
-        '")\n}\n'
-    }
+    output += `${COMPONENT_IDENTIFIER}.options.__file = ${_s(config.shortFilePath)}\n`
   }
 
   if (customBlocks.length) {
-    let addedPrefix = false
+    output += '\n/* Custom Blocks */\n'
     customBlocks.forEach((customBlock, i) => {
-      const TYPE = `customBlock_${customBlock.descriptor.type}_${i}`
-      const BLOCK = `__vue_${TYPE}__`
-      if (!addedPrefix) output += `\n/* Custom Blocks */\n`
-      output += __vue_type__(TYPE, customBlock.id, config.esModule, false)
-      output += `if (typeof ${BLOCK} === 'function') { ${BLOCK}(Component) }\n`
-      addedPrefix = true
+      const name = `__vue_custom_block_${customBlock.descriptor.type}_${i}__`
+      output += importStatement(customBlock.id, {
+        esModule: config.esModule,
+        name
+      })
+      output += `if (typeof ${name} === 'function') { ${name}(${COMPONENT_IDENTIFIER}) }\n`
     })
   }
 
-  if (!config.isInjectable) {
-    if (needsHotReload) {
-      output +=
-        `\n/* hot reload */\n` +
-        `if (module.hot) { (function () {\n` +
-        `  var hotAPI = require(${_s(config.require.vueHotReloadAPI)})\n` +
-        `  hotAPI.install(require('vue'), false)\n` +
-        `  if (!hotAPI.compatible) return\n` +
-        `  module.hot.accept()\n` +
-        `  if (!module.hot.data) {\n` +
-        // initial insert
-        `    hotAPI.createRecord(${_s(config.moduleId)}, Component.options)\n` +
-        `  } else {\n`
-        // update
-      if (cssModules) {
-        output +=
-        `    if (module.hot.data.cssModules && Object.keys(module.hot.data.cssModules) !== Object.keys(cssModules)) {\n` +
-        `      delete Component.options._Ctor\n` +
-        `    }\n`
-      }
-
-      output +=
-        `    hotAPI.reload(${_s(config.moduleId)}, Component.options)\n` +
-        `  }\n`
-
-      // dispose
-      output +=
-        `  module.hot.dispose(function (data) {\n` +
-        (cssModules ? `    data.cssModules = cssModules\n` : '') +
-        `    disposed = true\n` +
-        `  })\n`
-
-      output +=
-        `})()}\n`
-    }
-
-    if (config.esModule) {
-      output += `\nexport default Component.options\n`
-    } else {
-      output += `\nmodule.exports = Component.exports\n`
-    }
+  if (config.esModule) {
+    output += `\nexport default ${COMPONENT_IDENTIFIER}.options\n`
   } else {
-    output =
-      `\n/* dependency injection */\n` +
-      `module.exports = function (injections) {\n${pad(output)}\n` +
-      `  return Component.exports\n` +
-      `}\n`
+    output += `\nmodule.exports = ${COMPONENT_IDENTIFIER}.options\n`
   }
 
   return output

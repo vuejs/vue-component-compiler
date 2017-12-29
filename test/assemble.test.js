@@ -3,7 +3,7 @@ const assemble = require('../src/assemble')
 const descriptors = {
   script: {
     type: 'script',
-    content: '\nexport default {}\n',
+    content: `\nconst name = { type: String }\nexport  \n\r\ndefault { props: { name } }\n`,
     start: 10,
     end: 12,
     attrs: []
@@ -60,8 +60,16 @@ const source = {
   ]
 }
 
-test('assemble code for SSR and HMR', () => {
-  const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx', isServer: true, hasStyleInjectFn: true, isHot: true, isProduction: false })
+test('inline assemble code for non-SSR production', () => {
+  const source = {
+    script: { content: descriptors.script.content, descriptor: descriptors.script },
+    styles: [
+      { content: descriptors.styles[0].content, descriptor: descriptors.styles[0] },
+      { content: descriptors.styles[1].content, descriptor: descriptors.styles[1] }
+    ],
+    render: { content: '{\n  render: function () {},\n  staticRenderFns: []\n}', descriptor: descriptors.template }
+  }
+  const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx' })
 
   console.log(result)
 })
@@ -80,12 +88,6 @@ test('assemble code for SSR production', () => {
 
 test('assemble code for non-SSR production as node module', () => {
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx', esModule: false })
-
-  console.log(result)
-})
-
-test('assemble code for non-SSR production with injections enabled', () => {
-  const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx', isInjectable: true })
 
   console.log(result)
 })
