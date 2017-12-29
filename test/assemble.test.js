@@ -67,7 +67,7 @@ test('inline assemble code for non-SSR production', () => {
       { content: descriptors.styles[0].content, descriptor: descriptors.styles[0] },
       { content: descriptors.styles[1].content, descriptor: descriptors.styles[1] }
     ],
-    render: { content: '{\n  render: function () {},\n  staticRenderFns: []\n}', descriptor: descriptors.template }
+    render: { content: 'export default {\n  render: function () {},\n  staticRenderFns: []\n}', descriptor: descriptors.template }
   }
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx' })
 

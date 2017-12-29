@@ -1,32 +1,12 @@
 const defaults = require('lodash.defaultsdeep')
-const { js_beautify: beautify } = require('js-beautify')
+const _s = require('./utils/stringify')
+const importStatement = require('./utils/import-statement')
 
 const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
 const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
-
-function _s (any) {
-  return JSON.stringify(any)
-}
-
-// eslint-disable-next-line camelcase
-function importStatement (id, { type, name, esModule, noIdentifier = false }) {
-  const header = type ? `\n/* ${type} */\n` : ''
-  name = name || `__vue_${type}__`
-
-  if (!id) return header + `var ${name} = null\n`
-
-  if (esModule) {
-    return header + (
-      noIdentifier ? `import ${_s(id)}\n` : `import ${name} from ${_s(id)}\n`
-    )
-  }
-
-  return header + (
-    noIdentifier ? `require(${_s(id)})\n` : `var ${name} = require(${_s(id)})\n`
-  )
-}
+const EXPORT_REGEX = /(export[\s\r\n]+default|module[\s\r\n]*\.exports[^=]*=)[\s\r\n]*/
 
 function inlineStyle (name, style, config) {
   let output = `var ${name} = {}\n` // TODO: Inline css modules if required.
@@ -121,7 +101,7 @@ module.exports = function assemble (source, filename, config) {
   })
   // <script>
   if (typeof script.content === 'string') {
-    output += '\n/* script */\n' + script.content.replace(/export[\s\r\n]+default/, '\nvar __vue_script__ = ') + '\n'
+    output += '\n/* script */\n' + script.content.replace(EXPORT_REGEX, '\nvar __vue_script__ = ') + '\n'
   } else {
     output += importStatement(script.id, {
       esModule: config.esModule,
@@ -135,11 +115,9 @@ module.exports = function assemble (source, filename, config) {
   // <template>
   if (typeof render.content === 'string') {
     output += `\n/* template */\n` +
-      `var __vue_template__ = (${
-        beautify(render.content, {
-          indent_size: 2 // eslint-disable-line camelcase
-        })
-      })\n`
+      `var __vue_template__ = (function () {\n${
+        pad(render.content.replace(EXPORT_REGEX, 'return ').trim())
+      }})()\n`
   } else {
     output += importStatement(render.id, {
       esModule: config.esModule,

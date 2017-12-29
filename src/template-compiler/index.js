@@ -9,7 +9,6 @@ module.exports = function compileTemplate (template, filename, config) {
   config = defaults(
     config,
     {
-      isHot: false,
       isServer: false,
       esModule: true,
       isProduction: true,
@@ -38,12 +37,9 @@ module.exports = function compileTemplate (template, filename, config) {
     errors: compiled.errors,
     tips: compiled.tips
   }
-  const vueHotReloadAPI = (config.require && config.require.vueHotReloadAPI) || 'vue-hot-reload-api'
 
   if (output.errors && output.errors.length) {
-    output.code = config.esModule === true
-      ? `export function render () {}\nexport var staticRenderFns = []`
-      : 'module.exports={render:function(){},staticRenderFns:[]}'
+    output.code = `function render () {}\nvar staticRenderFns = []`
   } else {
     output.code = transpile(
       'var render = ' + toFunction(compiled.render) + '\n' +
@@ -58,21 +54,12 @@ module.exports = function compileTemplate (template, filename, config) {
     ) {
       output.code += `render._withStripped = true\n`
     }
-
-    const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
-    output.code += config.esModule === true
-      ? `export default ${__exports__}`
-      : `module.exports = ${__exports__}`
-
-    if (!config.isProduction && config.isHot) {
-      output.code +=
-        '\nif (module.hot) {\n' +
-        '  module.hot.accept()\n' +
-        '  if (module.hot.data) {\n' +
-        `     require(${JSON.stringify(vueHotReloadAPI)}).rerender(${JSON.stringify(options.scopeId)}, module.exports)\n` +
-        '  }\n' +
-        '}'
-    }
+  }
+  const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
+  if (config.esModule !== true) {
+    output.code += `module.exports = ${__exports__}`
+  } else {
+    output.code += `export default ${__exports__}`
   }
 
   return output
