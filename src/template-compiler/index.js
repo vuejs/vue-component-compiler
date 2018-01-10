@@ -4,8 +4,12 @@ const defaults = require('lodash.defaultsdeep')
 const { js_beautify: beautify } = require('js-beautify')
 
 const transformRequire = require('./modules/transform-require')
+const assertType = require('../utils/assert-type')
 
 module.exports = function compileTemplate (template, filename, config) {
+  assertType({ filename }, 'string')
+  assertType({ descriptor: template.descriptor }, 'object')
+  assertType({ code: template.code }, 'string')
   config = defaults(
     config,
     {
@@ -45,7 +49,7 @@ module.exports = function compileTemplate (template, filename, config) {
       'var render = ' + toFunction(compiled.render) + '\n' +
       'var staticRenderFns = [' + compiled.staticRenderFns.map(toFunction).join(',') + ']',
       config.buble
-    ) + '\n'
+    )
 
     // mark with stripped (this enables Vue to use correct runtime proxy detection)
     if (
@@ -57,9 +61,9 @@ module.exports = function compileTemplate (template, filename, config) {
   }
   const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
   if (config.esModule !== true) {
-    output.code += `module.exports = ${__exports__}`
+    output.code += `\nmodule.exports = ${__exports__}`
   } else {
-    output.code += `export default ${__exports__}`
+    output.code += `\nexport default ${__exports__}`
   }
 
   return output

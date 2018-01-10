@@ -71,23 +71,23 @@ test('inline assemble code for non-SSR production', () => {
   }
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx' })
 
-  console.log(result)
+  // console.log(result)
 })
 
 test('assemble code for non-SSR production', () => {
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx' })
 
-  console.log(result)
+  // console.log(result)
 })
 
 test('assemble code for SSR production', () => {
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx', isServer: true, hasStyleInjectFn: true })
 
-  console.log(result)
+  // console.log(result)
 })
 
 test('assemble code for non-SSR production as node module', () => {
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx', esModule: false })
 
-  console.log(result)
+  // console.log(result)
 })

@@ -4,8 +4,12 @@ const defaults = require('lodash.defaultsdeep')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
+const assertType = require('../utils/assert-type')
 
 module.exports = function compileStyle (style, filename, config) {
+  assertType({ filename }, 'string')
+  assertType({ descriptor: style.descriptor }, 'object')
+  assertType({ code: style.code }, 'string')
   config = defaults(config, {
     async: false,
     needMap: true,
@@ -25,12 +29,8 @@ module.exports = function compileStyle (style, filename, config) {
     options.map = {
       inline: false,
       annotation: false,
-      prev: style.map
+      prev: style.map || false
     }
-  }
-
-  if (!style.descriptor) {
-    throw Error('SFC block descriptor is missing.')
   }
 
   // add plugin for scoped css rewrite

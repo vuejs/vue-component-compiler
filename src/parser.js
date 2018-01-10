@@ -4,11 +4,14 @@ const LRU = require('lru-cache')
 const hash = require('hash-sum')
 const { SourceMapGenerator } = require('source-map')
 
+const assertType = require('./utils/assert-type')
+
 const cache = LRU(100)
 const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
 module.exports = function (content, filename, config) {
+  assertType({ content, filename }, 'string')
   config = defaults(config, { needMap: true })
 
   const cacheKey = hash(filename + content)

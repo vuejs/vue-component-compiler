@@ -1,6 +1,7 @@
 const defaults = require('lodash.defaultsdeep')
 const _s = require('./utils/stringify')
 const importStatement = require('./utils/import-statement')
+const assertType = require('./utils/assert-type')
 
 const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
 const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
@@ -19,6 +20,8 @@ function inlineStyle (name, style, config) {
 }
 
 module.exports = function assemble (source, filename, config) {
+  assertType({ source }, 'object')
+  assertType({ filename }, 'string')
   config = defaults({}, config, {
     esModule: true,
     shortFilePath: filename,
