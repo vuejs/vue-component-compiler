@@ -2,7 +2,8 @@ const compiler = require('../src/template-compiler')
 
 test('should compile template to esModule', () => {
   const template = {
-    code: '<div>{{foo}}</div>\n'
+    code: '<div>{{foo}}</div>\n',
+    descriptor: {}
   }
   const compiled = compiler(template, 'foo.vue', { scopeId: 'xxx', isProduction: false })
 
@@ -12,7 +13,8 @@ test('should compile template to esModule', () => {
 
 test('should compile template to node module', () => {
   const template = {
-    code: '<div>{{foo}}</div>\n'
+    code: '<div>{{foo}}</div>\n',
+    descriptor: {}
   }
   const compiled = compiler(template, 'foo.vue', { scopeId: 'xxx', esModule: false, isProduction: false })
 

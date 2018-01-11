@@ -1,5 +1,5 @@
 <template>
-  <h1 :class="$style.my.title">Hello {{ name }}!</h1>
+  <h1 id="test" :class="my.title">Hello {{ name }}!</h1>
 </template>
 
 <script>

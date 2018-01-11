@@ -10,10 +10,10 @@ const COMPONENT_IDENTIFIER = '__vue_component__'
 const EXPORT_REGEX = /(export[\s\r\n]+default|module[\s\r\n]*\.exports[^=]*=)[\s\r\n]*/
 
 function inlineStyle (name, style, config) {
-  let output = `var ${name} = {}\n` // TODO: Inline css modules if required.
+  let output = `var ${name} = ${style.modules ? _s(style.modules) : '{}'}\n`
 
   output += `${name}.__inject__ = function (context) {\n` +
-    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, ${_s(style.content)}, ${config.isProduction}, context)\n` +
+    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, [[${_s(config.shortFilePath)}, ${_s(style.content)}, ${_s(style.descriptor.attrs.media)}, ${_s(style.map)}]], ${config.isProduction}, context)\n` +
     `}\n`
 
   return output
@@ -47,7 +47,7 @@ module.exports = function assemble (source, filename, config) {
 
   if (styles.length) {
     const cssModules = {}
-    let styleInjectionCode = ''
+    let styleInjectionCode = 'var __vue_css_modules__ = {}\n'
 
     // Import style injector.
     output += importStatement(
@@ -81,7 +81,8 @@ module.exports = function assemble (source, filename, config) {
           })
         } else {
           cssModules[moduleName] = true
-          styleInjectionCode += `this[${_s(moduleName)}] = ${IMPORT_NAME}\n`
+          styleInjectionCode += `__vue_css_modules__[${_s(moduleName)}] = ${IMPORT_NAME}\n` +
+          `Object.defineProperty(this, ${_s(moduleName)}, { get: function () { return __vue_css_modules__[${_s(moduleName)}] }})\n`
         }
       }
     })

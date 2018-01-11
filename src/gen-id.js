@@ -10,5 +10,5 @@ module.exports = function genId (file, context, key) {
   const rootId = contextPath[contextPath.length - 1]
   file = rootId + '/' + path.relative(context, file).replace(sepRE, '/') + (key || '')
 
-  return cache[file] || (cache[file] = hash(file))
+  return cache[file] || (cache[file] = 'data-v-' + hash(file))
 }

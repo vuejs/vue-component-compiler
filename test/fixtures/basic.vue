@@ -1,5 +1,5 @@
 <template>
-  <h1>Hello {{ name }}!</h1>
+  <h1 id="test" style="color: red">Hello {{ name }}!</h1>
 </template>
 
 <script>

@@ -26,6 +26,6 @@ fixtures.forEach(it => test(it, async () => {
     }
   }, filename)
 
-  console.log(it, '\n' + output)
+  // console.log(it, '\n' + output)
   // console.log(it, JSON.stringify({render, styles}, null, 2))
 }))
