@@ -97,5 +97,5 @@ fixtures.forEach(it => test(it, async () => {
   resolve()
 }))
 
-beforeAll(async () => { browser = await puppeteer.launch({ headless: false }) })
+beforeAll(async () => { browser = await puppeteer.launch() })
 afterAll(async () => browser && await browser.close())
