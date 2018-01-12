@@ -97,5 +97,9 @@ fixtures.forEach(it => test(it, async () => {
   resolve()
 }))
 
-beforeAll(async () => { browser = await puppeteer.launch() })
+beforeAll(async () => {
+  browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  })
+})
 afterAll(async () => browser && await browser.close())
