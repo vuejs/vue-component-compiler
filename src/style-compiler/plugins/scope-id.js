@@ -64,7 +64,7 @@ module.exports = postcss.plugin('add-id', function (opts) {
         if (/-?animation$/.test(decl.prop)) {
           decl.value = decl.value.split(',')
             .map(v => {
-              var vals = v.split(/\s+/)
+              var vals = v.trim().split(/\s+/)
               var name = vals[0]
               if (keyframes[name]) {
                 return [keyframes[name]].concat(vals.slice(1)).join(' ')
