@@ -1,6 +1,6 @@
 const compiler = require('vue-template-compiler/build.js')
 const transpile = require('vue-template-es2015-compiler')
-const { js_beautify: beautify } = require('js-beautify')
+const prettier = require('prettier')
 const { struct } = require('superstruct')
 
 const transformRequire = require('./modules/transform-require')
@@ -30,7 +30,8 @@ const Config = struct({
   optimizeSSR: true,
   buble: {
     transforms: {
-      stripWith: true
+      stripWith: true,
+      stripWithFunctional: false
     }
   },
   options: {
@@ -61,9 +62,13 @@ module.exports = function compileTemplate (template, filename, config) {
   if (output.errors && output.errors.length) {
     output.code = `function render () {}\nvar staticRenderFns = []`
   } else {
+    const stripWithFunctional = template.descriptor.attrs && template.descriptor.attrs.functional
+
+    config.buble.transforms.stripWithFunctional = stripWithFunctional
+
     output.code = transpile(
-      'var render = ' + toFunction(compiled.render) + '\n' +
-      'var staticRenderFns = [' + compiled.staticRenderFns.map(toFunction).join(',') + ']',
+      'var render = ' + toFunction(compiled.render, stripWithFunctional) + '\n' +
+      'var staticRenderFns = [' + compiled.staticRenderFns.map(it => toFunction(it, stripWithFunctional)).join(',') + ']',
       config.buble
     )
 
@@ -85,8 +90,8 @@ module.exports = function compileTemplate (template, filename, config) {
   return output
 }
 
-function toFunction (code) {
-  return 'function () {' + beautify(code, {
-    indent_size: 2 // eslint-disable-line camelcase
-  }) + '}'
+function toFunction (code, stripWithFunctional) {
+  return `function (${stripWithFunctional ? '_h,_vm' : ''}) {\n  ${
+    prettier.format(code).split(/\r?\n/).map(it => '  ' + it).join('\n')
+  }\n}`
 }
