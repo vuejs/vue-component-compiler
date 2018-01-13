@@ -7,7 +7,7 @@ module.exports = {
   process (src, path) {
     let code = src
     if (path.endsWith('.vue')) code = compile(path, src)
-    else if (path.endsWith('.png')) code = `export default "data:image/png;base64,${fs.readFileSync(path, 'base64')}"`
+    else if (path.endsWith('.png')) code = `module.exports = "data:image/png;base64,${fs.readFileSync(path, 'base64')}"`
 
     return babel.transform(code, { presets: [
       ['env', { targets: { node: 'current' }}]
