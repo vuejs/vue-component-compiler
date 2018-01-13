@@ -11,9 +11,11 @@ const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
 const Config = struct({
-  needMap: 'boolean?'
+  needMap: 'boolean?',
+  bustCache: 'boolean?'
 }, {
-  needMap: true
+  needMap: true,
+  bustCache: false
 })
 
 module.exports = function (content, filename, config) {
@@ -21,7 +23,7 @@ module.exports = function (content, filename, config) {
   config = Config(config)
 
   const cacheKey = hash(filename + content)
-  const filenameWithHash = filename + '?' + cacheKey // source-map cache busting for hot-reloadded modules
+  const filenameWithHash = config.bustCache ? filename + '?' + cacheKey : filename // source-map cache busting for hot-reloadded modules
 
   if (cache.has(cacheKey)) return cache.get(cacheKey)
 
