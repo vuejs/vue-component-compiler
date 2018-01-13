@@ -1,28 +1,39 @@
 const postcss = require('postcss')
-const cssModules = require('postcss-modules-sync').default
-const defaults = require('lodash.defaultsdeep')
+const { default: cssModules } = require('postcss-modules-sync')
+const { struct } = require('superstruct')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
 const assertType = require('../utils/assert-type')
 
+const Style = struct({
+  code: 'string',
+  map: 'object?',
+  descriptor: 'object'
+})
+
+const Config = struct({
+  async: 'boolean?',
+  needMap: 'boolean?',
+  onWarn: 'function?',
+  options: 'object?',
+  plugins: 'array?',
+  scopeId: 'string'
+}, {
+  async: false,
+  needMap: true,
+  onWarn: () => message => console.warn(message),
+  options: {},
+  plugins: []
+})
+
 module.exports = function compileStyle (style, filename, config) {
   assertType({ filename }, 'string')
-  assertType({ descriptor: style.descriptor }, 'object')
-  assertType({ code: style.code }, 'string')
-  config = defaults(config, {
-    async: false,
-    needMap: true,
-    plugins: [],
-    options: {},
-    onWarn: message => console.warn(message)
-  })
+  style = Style(style)
+  config = Config(config)
 
   const plugins = [trim].concat(config.plugins)
-  const options = Object.assign({
-    to: filename,
-    from: filename
-  }, config.options)
+  const options = Object.assign({ to: filename, from: filename }, config.options)
 
   // source map
   if (config.needMap) {

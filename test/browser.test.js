@@ -17,19 +17,22 @@ fixtures.forEach(it => test(it, async () => {
   const descriptor = compiler.parse(readFileSync(filename).toString(), filename, { needMap: true })
   const scopeId = compiler.generateScopeId(it + '.vue', join(__dirname, 'fixtures'))
   const render = descriptor.template ? compiler.compileTemplate(
-    { code: descriptor.template.content, descriptor: descriptor.template }, filename
+    { code: descriptor.template.content, descriptor: descriptor.template }, filename, { scopeId }
   ) : null
   const styles = descriptor.styles.map(it => compiler.compileStyle(
     { code: it.content, descriptor: it }, filename, { scopeId }
-  )).map((style, i) => ({ descriptor: descriptor.styles[i], content: style.code, map: style.map, modules: style.modules }))
+  )).map((style, i) => ({ descriptor: descriptor.styles[i], code: style.code, map: style.map, modules: style.modules }))
   const source = compiler.assemble({
     styles,
     render: {
-      content: render && render.code
+      code: render && render.code,
+      descriptor: descriptor.template
     },
     script: {
-      content: descriptor.script && descriptor.script.content
-    }
+      code: descriptor.script && descriptor.script.content,
+      descriptor: descriptor.script
+    },
+    customBlocks: []
   }, filename, {
     scopeId,
     require: {

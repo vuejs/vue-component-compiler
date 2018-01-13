@@ -1,34 +1,48 @@
 const compiler = require('vue-template-compiler')
 const transpile = require('vue-template-es2015-compiler')
-const defaults = require('lodash.defaultsdeep')
 const { js_beautify: beautify } = require('js-beautify')
+const { struct } = require('superstruct')
 
 const transformRequire = require('./modules/transform-require')
 const assertType = require('../utils/assert-type')
 
+const Template = struct({
+  code: 'string',
+  map: 'object?',
+  descriptor: 'object'
+})
+
+const Config = struct({
+  scopeId: 'string',
+  isServer: 'boolean?',
+  isProduction: 'boolean?',
+  esModule: 'boolean?',
+  optimizeSSR: 'boolean?',
+  buble: 'object?',
+  options: 'object?',
+  transformRequire: 'object?',
+  plugins: 'array?'
+}, {
+  isServer: false,
+  esModule: true,
+  isProduction: true,
+  optimizeSSR: true,
+  buble: {
+    transforms: {
+      stripWith: true
+    }
+  },
+  options: {
+    preserveWhitespace: true,
+    modules: []
+  },
+  plugins: []
+})
+
 module.exports = function compileTemplate (template, filename, config) {
   assertType({ filename }, 'string')
-  assertType({ descriptor: template.descriptor }, 'object')
-  assertType({ code: template.code }, 'string')
-  config = defaults(
-    config,
-    {
-      isServer: false,
-      esModule: true,
-      isProduction: true,
-      optimizeSSR: true,
-      buble: {
-        transforms: {
-          stripWith: true
-        }
-      },
-      options: {
-        preserveWhitespace: true,
-        modules: []
-      },
-      plugins: []
-    }
-  )
+  template = Template(template)
+  config = Config(config)
 
   const options = config.options
 

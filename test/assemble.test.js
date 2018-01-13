@@ -62,12 +62,13 @@ const source = {
 
 test('inline assemble code for non-SSR production', () => {
   const source = {
-    script: { content: descriptors.script.content, descriptor: descriptors.script },
+    script: { code: descriptors.script.content, descriptor: descriptors.script },
     styles: [
-      { content: descriptors.styles[0].content, descriptor: descriptors.styles[0] },
-      { content: descriptors.styles[1].content, descriptor: descriptors.styles[1] }
+      { code: descriptors.styles[0].content, descriptor: descriptors.styles[0] },
+      { code: descriptors.styles[1].content, descriptor: descriptors.styles[1] }
     ],
-    render: { content: 'function render () {}\nvar staticRenderFns = []\nexport default {\n  render: render,\n  staticRenderFns: staticRenderFns\n}', descriptor: descriptors.template }
+    render: { code: 'function render () {}\nvar staticRenderFns = []\nexport default {\n  render: render,\n  staticRenderFns: staticRenderFns\n}', descriptor: descriptors.template },
+    customBlocks: []
   }
   const result = assemble(source, 'foo.vue', { scopeId: 'data-v-xxx' })
 
