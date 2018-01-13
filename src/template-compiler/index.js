@@ -1,9 +1,10 @@
-const compiler = require('vue-template-compiler')
+const compiler = require('vue-template-compiler/build.js')
 const transpile = require('vue-template-es2015-compiler')
 const { js_beautify: beautify } = require('js-beautify')
 const { struct } = require('superstruct')
 
 const transformRequire = require('./modules/transform-require')
+const transformSrcset = require('./modules/transform-srcset')
 const assertType = require('../utils/assert-type')
 
 const Template = struct({
@@ -48,6 +49,7 @@ module.exports = function compileTemplate (template, filename, config) {
 
   options.modules = options.modules.concat(config.plugins)
   options.modules.push(transformRequire(config.transformToRequire))
+  options.modules.push(transformSrcset())
 
   const compile = (config.isServer && config.optimizeSSR !== false && compiler.ssrCompile) ? compiler.ssrCompile : compiler.compile
   const compiled = compile(template.code, options)
