@@ -30,9 +30,9 @@ module.exports = postcss.plugin('add-id', function (opts) {
             }
             // /deep/ alias for >>>, since >>> doesn't work in SASS
             if (n.type === 'tag' && n.value === '/deep/') {
-              var next = n.next()
-              if (next.type === 'combinator' && next.value === ' ') {
-                next.remove()
+              var prev = n.prev()
+              if (prev.type === 'combinator' && prev.value === ' ') {
+                prev.remove()
               }
               n.remove()
               return false
