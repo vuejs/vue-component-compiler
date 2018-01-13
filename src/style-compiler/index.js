@@ -1,36 +1,47 @@
 const postcss = require('postcss')
-const cssModules = require('postcss-modules')
-const defaults = require('lodash.defaultsdeep')
+const { default: cssModules } = require('postcss-modules-sync')
+const { struct } = require('superstruct')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
+const assertType = require('../utils/assert-type')
+
+const Style = struct({
+  code: 'string',
+  map: 'object?',
+  descriptor: 'object'
+})
+
+const Config = struct({
+  async: 'boolean?',
+  needMap: 'boolean?',
+  onWarn: 'function?',
+  options: 'object?',
+  plugins: 'array?',
+  scopeId: 'string'
+}, {
+  async: false,
+  needMap: true,
+  onWarn: () => message => console.warn(message),
+  options: {},
+  plugins: []
+})
 
 module.exports = function compileStyle (style, filename, config) {
-  config = defaults(config, {
-    async: false,
-    needMap: true,
-    plugins: [],
-    options: {},
-    onWarn: message => console.warn(message)
-  })
+  assertType({ filename }, 'string')
+  style = Style(style)
+  config = Config(config)
 
   const plugins = [trim].concat(config.plugins)
-  const options = Object.assign({
-    to: filename,
-    from: filename
-  }, config.options)
+  const options = Object.assign({ to: filename, from: filename }, config.options)
 
   // source map
   if (config.needMap) {
     options.map = {
       inline: false,
       annotation: false,
-      prev: style.map
+      prev: style.map || false
     }
-  }
-
-  if (!style.descriptor) {
-    throw Error('SFC block descriptor is missing.')
   }
 
   // add plugin for scoped css rewrite
@@ -41,10 +52,11 @@ module.exports = function compileStyle (style, filename, config) {
     plugins.push(scopeId({ id: config.scopeId }))
   }
 
-  let modules
+  let modules = {}
   if (style.descriptor.module) {
     plugins.push(cssModules({
-      getJSON: (_, output) => { modules = output }
+      generateScopedName: config.generateScopedName || '[local]-[hash:base64:10]',
+      getJSON: output => { modules = output }
     }))
   }
 

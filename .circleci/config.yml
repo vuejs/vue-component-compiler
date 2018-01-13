@@ -1,9 +1,9 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/rollup-plugin-vue
+    working_directory: ~/project
     docker:
-      - image: circleci/node:8.5.0
+      - image: alekzonder/puppeteer # base image: node/8-slim
     steps:
       - checkout
       - run:

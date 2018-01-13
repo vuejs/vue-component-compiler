@@ -1,36 +1,55 @@
-const compiler = require('vue-template-compiler')
+const compiler = require('vue-template-compiler/build.js')
 const transpile = require('vue-template-es2015-compiler')
-const defaults = require('lodash.defaultsdeep')
 const { js_beautify: beautify } = require('js-beautify')
+const { struct } = require('superstruct')
 
 const transformRequire = require('./modules/transform-require')
+const transformSrcset = require('./modules/transform-srcset')
+const assertType = require('../utils/assert-type')
+
+const Template = struct({
+  code: 'string',
+  map: 'object?',
+  descriptor: 'object'
+})
+
+const Config = struct({
+  scopeId: 'string',
+  isServer: 'boolean?',
+  isProduction: 'boolean?',
+  esModule: 'boolean?',
+  optimizeSSR: 'boolean?',
+  buble: 'object?',
+  options: 'object?',
+  transformRequire: 'object?',
+  plugins: 'array?'
+}, {
+  isServer: false,
+  esModule: true,
+  isProduction: true,
+  optimizeSSR: true,
+  buble: {
+    transforms: {
+      stripWith: true
+    }
+  },
+  options: {
+    preserveWhitespace: true,
+    modules: []
+  },
+  plugins: []
+})
 
 module.exports = function compileTemplate (template, filename, config) {
-  config = defaults(
-    config,
-    {
-      isHot: false,
-      isServer: false,
-      esModule: true,
-      isProduction: true,
-      optimizeSSR: true,
-      buble: {
-        transforms: {
-          stripWith: true
-        }
-      },
-      options: {
-        preserveWhitespace: true,
-        modules: []
-      },
-      plugins: []
-    }
-  )
+  assertType({ filename }, 'string')
+  template = Template(template)
+  config = Config(config)
 
   const options = config.options
 
   options.modules = options.modules.concat(config.plugins)
   options.modules.push(transformRequire(config.transformToRequire))
+  options.modules.push(transformSrcset())
 
   const compile = (config.isServer && config.optimizeSSR !== false && compiler.ssrCompile) ? compiler.ssrCompile : compiler.compile
   const compiled = compile(template.code, options)
@@ -38,18 +57,15 @@ module.exports = function compileTemplate (template, filename, config) {
     errors: compiled.errors,
     tips: compiled.tips
   }
-  const vueHotReloadAPI = (config.require && config.require.vueHotReloadAPI) || 'vue-hot-reload-api'
 
   if (output.errors && output.errors.length) {
-    output.code = config.esModule === true
-      ? `export function render () {}\nexport var staticRenderFns = []`
-      : 'module.exports={render:function(){},staticRenderFns:[]}'
+    output.code = `function render () {}\nvar staticRenderFns = []`
   } else {
     output.code = transpile(
       'var render = ' + toFunction(compiled.render) + '\n' +
       'var staticRenderFns = [' + compiled.staticRenderFns.map(toFunction).join(',') + ']',
       config.buble
-    ) + '\n'
+    )
 
     // mark with stripped (this enables Vue to use correct runtime proxy detection)
     if (
@@ -58,21 +74,12 @@ module.exports = function compileTemplate (template, filename, config) {
     ) {
       output.code += `render._withStripped = true\n`
     }
-
-    const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
-    output.code += config.esModule === true
-      ? `export default ${__exports__}`
-      : `module.exports = ${__exports__}`
-
-    if (!config.isProduction && config.isHot) {
-      output.code +=
-        '\nif (module.hot) {\n' +
-        '  module.hot.accept()\n' +
-        '  if (module.hot.data) {\n' +
-        `     require(${JSON.stringify(vueHotReloadAPI)}).rerender(${JSON.stringify(options.scopeId)}, module.exports)\n` +
-        '  }\n' +
-        '}'
-    }
+  }
+  const __exports__ = `{ render: render, staticRenderFns: staticRenderFns }`
+  if (config.esModule !== true) {
+    output.code += `\nmodule.exports = ${__exports__}`
+  } else {
+    output.code += `\nexport default ${__exports__}`
   }
 
   return output

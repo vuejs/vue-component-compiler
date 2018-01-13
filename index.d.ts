@@ -91,6 +91,7 @@ declare module VueComponentCompiler {
     plugins?: Array<object> // postcss plugins
     options?: object // postcss options
     onWarn?: MessageHandler
+    generateScopedName?: string
   }
 
   type MessageHandler = (message: Message) => void
@@ -113,7 +114,6 @@ declare module VueComponentCompiler {
 
   type TemplateCompilerConfig = {
     scopeId: string
-    isHot?: boolean // false
     isServer?: boolean // false
     isProduction?: boolean // true
     esModule?: boolean // true
@@ -133,12 +133,13 @@ declare module VueComponentCompiler {
 
   type AssemblerSource = {
     script: {
-      id: string,
+      id: string?,
+      code: string?,
       descriptor: ScriptDescriptor
     }
     styles: Array<{
-      id: string
-      hotPath: string
+      id: string?,
+      code: string?,
       descriptor: StyleDescriptor
     }>
     render: {

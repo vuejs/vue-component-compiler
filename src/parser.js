@@ -1,15 +1,24 @@
-const compiler = require('vue-template-compiler')
-const defaults = require('lodash.defaultsdeep')
+const compiler = require('vue-template-compiler/build.js')
+const { struct } = require('superstruct')
 const LRU = require('lru-cache')
 const hash = require('hash-sum')
 const { SourceMapGenerator } = require('source-map')
+
+const assertType = require('./utils/assert-type')
 
 const cache = LRU(100)
 const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
+const Config = struct({
+  needMap: 'boolean?'
+}, {
+  needMap: true
+})
+
 module.exports = function (content, filename, config) {
-  config = defaults(config, { needMap: true })
+  assertType({ content, filename }, 'string')
+  config = Config(config)
 
   const cacheKey = hash(filename + content)
   const filenameWithHash = filename + '?' + cacheKey // source-map cache busting for hot-reloadded modules
