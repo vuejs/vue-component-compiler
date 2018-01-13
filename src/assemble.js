@@ -194,7 +194,9 @@ module.exports = function assemble (source, filename, config) {
         esModule: config.esModule,
         name
       })
-      output += `if (typeof ${name} === 'function') { ${name}(${COMPONENT_IDENTIFIER}) }\n`
+      output +=
+        `if (${name} && ${name}.__esModule) ${name} = ${name}.__esModule\n` +
+        `if (typeof ${name} === 'function') { ${name}(${COMPONENT_IDENTIFIER}) }\n`
     })
   }
 
