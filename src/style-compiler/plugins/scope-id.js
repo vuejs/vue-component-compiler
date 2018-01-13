@@ -20,7 +20,7 @@ module.exports = postcss.plugin('add-id', function (opts) {
       }
       node.selector = selectorParser(function (selectors) {
         selectors.each(function (selector) {
-          const node = null
+          let node = null
           selector.each(function (n) {
             // ">>>" combinator
             if (n.type === 'combinator' && n.value === '>>>') {
