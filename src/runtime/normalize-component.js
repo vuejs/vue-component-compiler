@@ -5,6 +5,7 @@
 export default function normalizeComponent (
   rawScriptExports,
   compiledTemplate,
+  isFunctionalTemplate,
   injectStyles,
   scopeId,
   moduleIdentifier /* server only */
@@ -28,6 +29,11 @@ export default function normalizeComponent (
   if (compiledTemplate) {
     options.render = compiledTemplate.render
     options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  if (isFunctionalTemplate) {
+    options.functional = true
   }
 
   // scopedId
@@ -74,6 +80,9 @@ export default function normalizeComponent (
         ? [].concat(existing, hook)
         : [hook]
     } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
       // register for functioal component in vue file
       options.render = function renderWithStyleInjection (h, context) {
         hook.call(context)

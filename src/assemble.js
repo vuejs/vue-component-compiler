@@ -159,6 +159,10 @@ module.exports = function assemble (source, filename, config) {
     })
   }
 
+  // template functional
+  output += '\n/* template functional */\n'
+  output += 'var __vue_template_functional__ = ' + (render.descriptor && render.descriptor.attrs && render.descriptor.attrs.functional ? 'true' : 'false') + '\n'
+
   // style
   output += '\n/* styles */\n'
   output += 'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
@@ -175,6 +179,7 @@ module.exports = function assemble (source, filename, config) {
   output += `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
   '  __vue_script__,\n' +
   '  __vue_template__,\n' +
+  '  __vue_template_functional__,\n' +
   '  __vue_styles__,\n' +
   '  __vue_scopeId__,\n' +
   '  __vue_module_identifier__\n' +

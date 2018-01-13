@@ -49,10 +49,11 @@
     "postcss": "^6.0.12",
     "postcss-modules-sync": "^1.0.0",
     "postcss-selector-parser": "^2.2.3",
+    "prettier": "^1.10.2",
     "source-map": "^0.6.1",
     "superstruct": "^0.5.0",
     "vue-hot-reload-api": "^2.1.0",
     "vue-template-compiler": "^2.5.13",
-    "vue-template-es2015-compiler": "^1.5.3"
+    "vue-template-es2015-compiler": "^1.6.0"
   }
 }

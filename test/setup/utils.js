@@ -9,6 +9,15 @@ const compiler = require('../..')
 
 module.exports = { compile, build, open, pack }
 
+function vue () {
+  return {
+    name: 'vue',
+    transform (code, id) {
+      if (id.endsWith('.vue')) return compile(id, code)
+    }
+  }
+}
+
 function inline (filename, code) {
   return {
     name: 'Inline',
@@ -75,7 +84,7 @@ async function pack (filename, source) {
   let bundle = await rollup.rollup({
     input: name,
     plugins: [
-      inline(name, compile(filename, source)), babelit
+      inline(name, compile(filename, source)), vue(), babelit
     ]
   })
   bundle = await rollup.rollup({
@@ -100,6 +109,7 @@ async function build (filename) {
   let bundle = await rollup.rollup({
     input,
     plugins: [
+      vue(),
       image(),
       nodeResolve(),
       inline(component, source),
@@ -124,7 +134,7 @@ async function build (filename) {
   bundle = await rollup.rollup({
     input: component,
     plugins: [
-      image(), commonjs(), inline(component, generated.code), babelit
+      vue(), image(), commonjs(), inline(component, generated.code), babelit
     ]
   })
 
@@ -145,7 +155,7 @@ async function open (browser, code, id = '#test') {
   <!doctype html>
   <html>
     <head>
-      <title>Test: ${it}</title>
+      <title>Test</title>
     </head>
     <body>
       <div id="app"></div>
