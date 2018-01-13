@@ -2,13 +2,7 @@
 // used in scoped CSS rewriting
 const path = require('path')
 const hash = require('hash-sum')
-const cache = Object.create(null)
-const sepRE = new RegExp(path.sep.replace('\\', '\\\\'), 'g')
 
-module.exports = function genId (file, context, key) {
-  const contextPath = context.split(path.sep)
-  const rootId = contextPath[contextPath.length - 1]
-  file = rootId + '/' + path.relative(context, file).replace(sepRE, '/') + (key || '')
-
-  return cache[file] || (cache[file] = 'data-v-' + hash(file))
+module.exports = function genId (filename, content, isProduction = true) {
+  return isProduction ? hash(path.basename(filename) + '\n' + content) : hash(filename)
 }
