@@ -33,7 +33,7 @@ function load (ext, handle) {
 function compile (filename, source) {
   source = source || readFileSync(filename).toString()
   const descriptor = compiler.parse(source, filename, { needMap: true })
-  const scopeId = compiler.generateScopeId(filename, join(__dirname, 'fixtures'))
+  const scopeId = compiler.generateScopeId(filename, source)
   const render = descriptor.template ? compiler.compileTemplate(
     { code: descriptor.template.content, descriptor: descriptor.template }, filename, { scopeId }
   ) : null
