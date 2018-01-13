@@ -20,7 +20,7 @@ module.exports = postcss.plugin('add-id', function (opts) {
       }
       node.selector = selectorParser(function (selectors) {
         selectors.each(function (selector) {
-          var node = null
+          let node = null
           selector.each(function (n) {
             // ">>>" combinator
             if (n.type === 'combinator' && n.value === '>>>') {
@@ -30,9 +30,9 @@ module.exports = postcss.plugin('add-id', function (opts) {
             }
             // /deep/ alias for >>>, since >>> doesn't work in SASS
             if (n.type === 'tag' && n.value === '/deep/') {
-              var next = n.next()
-              if (next.type === 'combinator' && next.value === ' ') {
-                next.remove()
+              const prev = n.prev()
+              if (prev.type === 'combinator' && prev.value === ' ') {
+                prev.remove()
               }
               n.remove()
               return false
@@ -64,10 +64,12 @@ module.exports = postcss.plugin('add-id', function (opts) {
         if (/-?animation$/.test(decl.prop)) {
           decl.value = decl.value.split(',')
             .map(v => {
-              var vals = v.split(/\s+/)
-              var name = vals[0]
-              if (keyframes[name]) {
-                return [keyframes[name]].concat(vals.slice(1)).join(' ')
+              const vals = v.trim().split(/\s+/)
+              const i = vals.findIndex(val => keyframes[val])
+              if (i !== -1) {
+                vals.splice(i, 1, keyframes[vals[i]])
+
+                return vals.join(' ')
               } else {
                 return v
               }
