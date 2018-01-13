@@ -19,9 +19,9 @@ fixtures.forEach(it => test(it, async () => {
   const render = descriptor.template ? compiler.compileTemplate(
     { code: descriptor.template.content, descriptor: descriptor.template }, filename
   ) : null
-  const styles = (await Promise.all(descriptor.styles.map(async it => await compiler.compileStyle(
-    { code: it.content, descriptor: it }, filename, { async: true, scopeId }
-  )))).map((style, i) => ({ descriptor: descriptor.styles[i], content: style.code, map: style.map, modules: style.modules }))
+  const styles = descriptor.styles.map(it => compiler.compileStyle(
+    { code: it.content, descriptor: it }, filename, { scopeId }
+  )).map((style, i) => ({ descriptor: descriptor.styles[i], content: style.code, map: style.map, modules: style.modules }))
   const source = compiler.assemble({
     styles,
     render: {

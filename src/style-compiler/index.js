@@ -1,5 +1,5 @@
 const postcss = require('postcss')
-const cssModules = require('postcss-modules')
+const cssModules = require('postcss-modules-sync').default
 const defaults = require('lodash.defaultsdeep')
 
 const trim = require('./plugins/trim')
@@ -41,10 +41,11 @@ module.exports = function compileStyle (style, filename, config) {
     plugins.push(scopeId({ id: config.scopeId }))
   }
 
-  let modules
+  let modules = {}
   if (style.descriptor.module) {
     plugins.push(cssModules({
-      getJSON: (_, output) => { modules = output }
+      generateScopedName: config.generateScopedName || '[local]-[hash:base64:10]',
+      getJSON: output => { modules = output }
     }))
   }
 

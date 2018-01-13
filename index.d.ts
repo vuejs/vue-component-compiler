@@ -91,6 +91,7 @@ declare module VueComponentCompiler {
     plugins?: Array<object> // postcss plugins
     options?: object // postcss options
     onWarn?: MessageHandler
+    generateScopedName?: string
   }
 
   type MessageHandler = (message: Message) => void
