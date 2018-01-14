@@ -79,7 +79,9 @@ module.exports = function assemble (source, filename, config) {
 
   if (styles.length) {
     const cssModules = {}
-    let styleInjectionCode = 'var __vue_css_modules__ = {}\n'
+    let styleInjectionCode = ''
+
+    output += 'var __vue_css_modules__ = {}\n'
 
     // Import style injector.
     output += importStatement(
