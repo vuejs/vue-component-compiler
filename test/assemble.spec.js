@@ -1,9 +1,10 @@
 import { mount } from '@vue/test-utils'
 
 // Fixtures
-import Transform from './fixtures/transform.vue'
-import Functional from './fixtures/functional.vue'
-import FunctionalRoot from './fixtures/functional-root.vue'
+import Transform from './fixtures/with-template-require-transform.vue'
+import Functional from './fixtures/with-template-functional.vue'
+import FunctionalRoot from './fixtures/with-template-functional-root.vue'
+import TemplateComment from './fixtures/with-template-comment.vue'
 
 test('transfom to require', () => {
   const wrapper = mount(Transform)
@@ -53,4 +54,15 @@ test('functional template', () => {
 
   wrapper.find('.clickable').trigger('click')
   expect(fn).toHaveBeenCalled()
+})
+
+test('template comments', () => {
+  const wrapper = mount(TemplateComment)
+
+  expect(wrapper.is('div')).toBeTruthy()
+  expect(wrapper.find('h2')).toBeTruthy()
+  expect(wrapper.find('h2.red')).toBeTruthy()
+  expect(wrapper.find('h2#test')).toBeTruthy()
+  expect(wrapper.vnode.children[1].isComment).toEqual(true)
+  expect(wrapper.vnode.children[1].text).toEqual(expect.stringContaining('comment here'))
 })

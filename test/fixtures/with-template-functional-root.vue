@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Functional from './functional.vue'
+import Functional from './with-template-functional.vue'
 export default {
   components: {
     Functional

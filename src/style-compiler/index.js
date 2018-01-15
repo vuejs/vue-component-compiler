@@ -1,6 +1,7 @@
 const postcss = require('postcss')
 const { default: cssModules } = require('postcss-modules-sync')
 const { struct } = require('superstruct')
+const defaultsdeep = require('lodash.defaultsdeep')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
@@ -12,14 +13,14 @@ const Style = struct({
   descriptor: 'object'
 })
 
-const Config = struct({
+const Config = any => defaultsdeep(struct({
   async: 'boolean?',
   needMap: 'boolean?',
   onWarn: 'function?',
   options: 'object?',
   plugins: 'array?',
   scopeId: 'string'
-}, {
+})(any), {
   async: false,
   needMap: true,
   onWarn: () => message => console.warn(message),

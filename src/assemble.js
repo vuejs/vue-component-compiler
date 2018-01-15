@@ -1,4 +1,5 @@
 const { struct } = require('superstruct')
+const defaultsdeep = require('lodash.defaultsdeep')
 const _s = require('./utils/stringify')
 const importStatement = require('./utils/import-statement')
 const assertType = require('./utils/assert-type')
@@ -46,7 +47,7 @@ const Source = struct({
     descriptor: struct.union(['object', 'null'])
   }])
 })
-const Config = struct({
+const Config = any => defaultsdeep(struct({
   esModule: 'boolean?',
   require: 'object?',
   scopeId: 'string?',
@@ -55,7 +56,7 @@ const Config = struct({
   isProduction: 'boolean?',
   hasStyleInjectFn: 'boolean?',
   onWarn: 'function?'
-}, {
+})(any), {
   esModule: true,
   require: {
     normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component',

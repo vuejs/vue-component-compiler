@@ -5,6 +5,7 @@ const nodeResolve = require('rollup-plugin-node-resolve')
 const image = require('rollup-plugin-image')
 const { readFileSync } = require('fs')
 const { join, resolve } = require('path')
+const defaultsdeep = require('lodash.defaultsdeep')
 const compiler = require('../..')
 
 module.exports = { compile, build, open, pack }
@@ -39,15 +40,15 @@ function load (ext, handle) {
   }
 }
 
-function compile (filename, source) {
+function compile (filename, source, options = {}) {
   source = source || readFileSync(filename).toString()
   const descriptor = compiler.parse(source, filename, { needMap: true })
   const scopeId = compiler.generateScopeId(filename, source)
   const render = descriptor.template ? compiler.compileTemplate(
-    { code: descriptor.template.content, descriptor: descriptor.template }, filename, { scopeId }
+    { code: descriptor.template.content, descriptor: descriptor.template }, filename, defaultsdeep({ scopeId }, options.template)
   ) : null
   const styles = descriptor.styles.map(it => compiler.compileStyle(
-    { code: it.content, descriptor: it }, filename, { scopeId }
+    { code: it.content, descriptor: it }, filename, defaultsdeep({ scopeId }, options.style)
   )).map((style, i) => ({ descriptor: descriptor.styles[i], code: style.code, map: style.map, modules: style.modules }))
   return compiler.assemble({
     styles,
@@ -60,14 +61,14 @@ function compile (filename, source) {
       descriptor: descriptor.script
     },
     customBlocks: []
-  }, filename, {
+  }, filename, defaultsdeep({
     scopeId,
     require: {
       normalizeComponent: resolve(__dirname, '../../src/runtime/normalize-component.js'),
       injectStyleClient: resolve(__dirname, '../../src/runtime/inject-style-client.js'),
       injectStyleServer: resolve(__dirname, '../../src/runtime/inject-style-server.js')
     }
-  })
+  }), options.assemble)
 }
 
 const babelit = babel({
@@ -99,10 +100,10 @@ async function pack (filename, source) {
 }
 
 const cache = {}
-async function build (filename) {
+async function build (filename, source) {
   if (filename in cache) return cache[filename]
 
-  const source = compile(filename)
+  source = source || compile(filename)
   const component = filename + '__.js'
   const input = filename + '__app.js'
 

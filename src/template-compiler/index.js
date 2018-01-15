@@ -2,6 +2,7 @@ const compiler = require('vue-template-compiler/build.js')
 const transpile = require('vue-template-es2015-compiler')
 const prettier = require('prettier')
 const { struct } = require('superstruct')
+const defaultsdeep = require('lodash.defaultsdeep')
 
 const transformRequire = require('./modules/transform-require')
 const transformSrcset = require('./modules/transform-srcset')
@@ -13,7 +14,7 @@ const Template = struct({
   descriptor: 'object'
 })
 
-const Config = struct({
+const Config = any => defaultsdeep(struct({
   scopeId: 'string',
   isServer: 'boolean?',
   isProduction: 'boolean?',
@@ -23,7 +24,7 @@ const Config = struct({
   options: 'object?',
   transformRequire: 'object?',
   plugins: 'array?'
-}, {
+})(any), {
   isServer: false,
   esModule: true,
   isProduction: true,
@@ -36,7 +37,9 @@ const Config = struct({
   },
   options: {
     preserveWhitespace: true,
-    modules: []
+    comments: true,
+    modules: [],
+    directives: []
   },
   plugins: []
 })
@@ -48,9 +51,13 @@ module.exports = function compileTemplate (template, filename, config) {
 
   const options = config.options
 
-  options.modules = options.modules.concat(config.plugins)
-  options.modules.push(transformRequire(config.transformToRequire))
-  options.modules.push(transformSrcset())
+  options.scopeId = config.scopeId
+  options.modules = [].concat(
+    options.modules || [],
+    config.plugins || [], [
+      transformRequire(config.transformToRequire),
+      transformSrcset()
+    ])
 
   const compile = (config.isServer && config.optimizeSSR !== false && compiler.ssrCompile) ? compiler.ssrCompile : compiler.compile
   const compiled = compile(template.code, options)
@@ -60,7 +67,7 @@ module.exports = function compileTemplate (template, filename, config) {
   }
 
   if (output.errors && output.errors.length) {
-    output.code = `function render () {}\nvar staticRenderFns = []`
+    output.code = `function render () {}\nvar staticRenderFns = []\n`
   } else {
     const stripWithFunctional = template.descriptor.attrs && template.descriptor.attrs.functional
 
@@ -68,7 +75,7 @@ module.exports = function compileTemplate (template, filename, config) {
 
     output.code = transpile(
       'var render = ' + toFunction(compiled.render, stripWithFunctional) + '\n' +
-      'var staticRenderFns = [' + compiled.staticRenderFns.map(it => toFunction(it, stripWithFunctional)).join(',') + ']',
+      'var staticRenderFns = [' + compiled.staticRenderFns.map(it => toFunction(it, stripWithFunctional)).join(',') + ']\n',
       config.buble
     )
 

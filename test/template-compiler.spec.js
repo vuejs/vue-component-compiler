@@ -1,6 +1,6 @@
 const compiler = require('../src/template-compiler')
 
-test('should compile template to esModule', () => {
+test('es module render functions', () => {
   const template = {
     code: '<div>{{foo}}</div>\n',
     descriptor: {}
@@ -11,7 +11,7 @@ test('should compile template to esModule', () => {
   expect(compiled.code.indexOf('render._withStripped')).toBeGreaterThan(-1)
 })
 
-test('should compile template to node module', () => {
+test('cjs render functions', () => {
   const template = {
     code: '<div>{{foo}}</div>\n',
     descriptor: {}
@@ -20,4 +20,14 @@ test('should compile template to node module', () => {
 
   expect(compiled.code.indexOf('export default')).toBe(-1)
   expect(compiled.code.indexOf('render._withStripped')).toBeGreaterThan(-1)
+})
+
+test('template comments', () => {
+  const template = {
+    code: `<div>\n<h2 class="red" id="test">{{msg}}</h2><!-- comment here -->\n</div>\n`,
+    descriptor: {}
+  }
+  const compiled = compiler(template, 'foo.vue', { scopeId: 'xxx' })
+
+  expect(compiled.code).toEqual(expect.stringContaining('comment here'))
 })
