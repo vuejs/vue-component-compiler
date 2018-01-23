@@ -1,12 +1,13 @@
-const compiler = require('vue-template-compiler/build.js')
-const transpile = require('vue-template-es2015-compiler')
+const pad = require('../utils/pad')
 const prettier = require('prettier')
 const { struct } = require('superstruct')
 const defaultsdeep = require('lodash.defaultsdeep')
+const transpile = require('vue-template-es2015-compiler')
+const compiler = require('vue-template-compiler/build.js')
 
-const transformRequire = require('./modules/transform-require')
-const transformSrcset = require('./modules/transform-srcset')
 const assertType = require('../utils/assert-type')
+const transformSrcset = require('./modules/transform-srcset')
+const transformRequire = require('./modules/transform-require')
 
 const Template = struct({
   code: 'string',
@@ -58,7 +59,7 @@ module.exports = function compileTemplate (template, filename, config) {
   options.scopeId = config.scopeId
   options.modules = [].concat(options.modules || [], config.plugins || [], [
     transformRequire(config.transformToRequire),
-    transformSrcset()
+    transformSrcset
   ])
 
   const compile =
@@ -107,9 +108,7 @@ module.exports = function compileTemplate (template, filename, config) {
 }
 
 function toFunction (code, stripWithFunctional) {
-  return `function (${stripWithFunctional ? '_h,_vm' : ''}) {\n  ${prettier
-    .format(code)
-    .split(/\r?\n/)
-    .map(it => '  ' + it)
-    .join('\n')}\n}`
+  return `function (${stripWithFunctional ? '_h,_vm' : ''}) {\n  ${
+    pad(prettier.format(code))
+  }}`
 }

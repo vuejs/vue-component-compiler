@@ -1,10 +1,9 @@
-const compiler = require('vue-template-compiler')
-const { struct } = require('superstruct')
 const LRU = require('lru-cache')
 const hash = require('hash-sum')
-const { SourceMapGenerator } = require('source-map')
-
+const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
+const compiler = require('vue-template-compiler')
+const { SourceMapGenerator } = require('source-map')
 
 const cache = LRU(100)
 const splitRE = /\r?\n/g
@@ -17,7 +16,7 @@ const Config = struct(
   },
   {
     needMap: true,
-    needCSSMap: false
+    needCSSMap: true
   }
 )
 

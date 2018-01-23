@@ -1,7 +1,7 @@
 const postcss = require('postcss')
-const { default: cssModules } = require('postcss-modules-sync')
 const { struct } = require('superstruct')
 const defaultsdeep = require('lodash.defaultsdeep')
+const { default: cssModules } = require('postcss-modules-sync')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')

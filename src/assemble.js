@@ -1,13 +1,14 @@
-const { struct } = require('superstruct')
-const defaultsdeep = require('lodash.defaultsdeep')
+const pad = require('./utils/pad')
 const _s = require('./utils/stringify')
-const importStatement = require('./utils/import-statement')
+const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
+const defaultsdeep = require('lodash.defaultsdeep')
+const importStatement = require('./utils/import-statement')
 
-const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
-const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
+const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
+const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
 const EXPORT_REGEX = /(export[\s\r\n]+default|module[\s\r\n]*\.exports[^=]*=)[\s\r\n]*/
 
 function inlineStyle (name, style, config) {
@@ -56,6 +57,7 @@ const Source = struct({
     }
   ])
 })
+
 const Config = any =>
   defaultsdeep(
     struct({
@@ -262,14 +264,4 @@ module.exports = function assemble (source, filename, config) {
   }
 
   return output
-}
-
-function pad (content) {
-  return (
-    content
-      .trim()
-      .split(/\n\r?/)
-      .map(line => '  ' + line)
-      .join('\n') + '\n'
-  )
 }
