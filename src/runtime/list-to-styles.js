@@ -18,7 +18,7 @@ export default function listToStyles (parentId, list) {
       sourceMap: sourceMap
     }
     if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] })
+      styles.push((newStyles[id] = { id: id, parts: [part] }))
     } else {
       newStyles[id].parts.push(part)
     }

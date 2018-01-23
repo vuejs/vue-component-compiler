@@ -11,7 +11,7 @@ export default function normalizeComponent (
   moduleIdentifier /* server only */
 ) {
   var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
+  var scriptExports = (rawScriptExports = rawScriptExports || {})
 
   // ES6 modules interop
   var type = typeof rawScriptExports.default
@@ -21,9 +21,8 @@ export default function normalizeComponent (
   }
 
   // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
+  var options =
+    typeof scriptExports === 'function' ? scriptExports.options : scriptExports
 
   // render functions
   if (compiledTemplate) {
@@ -42,7 +41,8 @@ export default function normalizeComponent (
   }
 
   var hook
-  if (moduleIdentifier) { // server build
+  if (moduleIdentifier) {
+    // server build
     hook = function (context) {
       // 2.3 injection
       context =
@@ -71,14 +71,10 @@ export default function normalizeComponent (
 
   if (hook) {
     var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
+    var existing = functional ? options.render : options.beforeCreate
     if (!functional) {
       // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
+      options.beforeCreate = existing ? [].concat(existing, hook) : [hook]
     } else {
       // for template-only hot-reload because in that case the render fn doesn't
       // go through the normalizer

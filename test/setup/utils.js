@@ -4,7 +4,7 @@ const commonjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const image = require('rollup-plugin-image')
 const { readFileSync } = require('fs')
-const { join, resolve } = require('path')
+const { resolve } = require('path')
 const defaultsdeep = require('lodash.defaultsdeep')
 const compiler = require('../..')
 

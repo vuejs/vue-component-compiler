@@ -19,7 +19,7 @@ type StyleObjectPart = {
 */
 
 const stylesInDom = {
-/*
+  /*
   [id: number]: {
     id: number,
     refs: number,
@@ -28,7 +28,7 @@ const stylesInDom = {
 */
 }
 
-const head = (document.head || document.getElementsByTagName('head')[0])
+const head = document.head || document.getElementsByTagName('head')[0]
 const noop = function () {}
 let singletonElement = null
 let singletonCounter = 0
@@ -36,7 +36,9 @@ let isProduction = false
 
 // Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
 // tags it will allow on a page
-const isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+const isOldIE =
+  typeof navigator !== 'undefined' &&
+  /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
 
 export default (parentId, list, _isProduction) => {
   isProduction = _isProduction
@@ -110,7 +112,9 @@ function createStyleElement () {
 
 function addStyle (obj /* StyleObjectPart */) {
   let update, remove
-  let styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
+  let styleElement = document.querySelector(
+    'style[data-vue-ssr-id~="' + obj.id + '"]'
+  )
 
   if (styleElement) {
     if (isProduction) {
@@ -146,12 +150,14 @@ function addStyle (obj /* StyleObjectPart */) {
 
   return function updateStyle (newObj /* StyleObjectPart */) {
     if (newObj) {
-      if (newObj.css === obj.css &&
-          newObj.media === obj.media &&
-          newObj.sourceMap === obj.sourceMap) {
+      if (
+        newObj.css === obj.css &&
+        newObj.media === obj.media &&
+        newObj.sourceMap === obj.sourceMap
+      ) {
         return
       }
-      update(obj = newObj)
+      update((obj = newObj))
     } else {
       remove()
     }
@@ -198,7 +204,10 @@ function applyToTag (styleElement, obj) {
     // this makes source maps inside style tags work properly in Chrome
     css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
     // http://stackoverflow.com/a/26603875
-    css += '\n/*# sourceMappingURL=data:application/json;base64,' + window.btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+    css +=
+      '\n/*# sourceMappingURL=data:application/json;base64,' +
+      window.btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) +
+      ' */'
   }
 
   if (styleElement.styleSheet) {

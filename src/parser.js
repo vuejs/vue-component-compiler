@@ -10,20 +10,25 @@ const cache = LRU(100)
 const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
-const Config = struct({
-  needMap: 'boolean?',
-  bustCache: 'boolean?'
-}, {
-  needMap: true,
-  bustCache: false
-})
+const Config = struct(
+  {
+    needMap: 'boolean?',
+    bustCache: 'boolean?'
+  },
+  {
+    needMap: true,
+    bustCache: false
+  }
+)
 
 module.exports = function (content, filename, config) {
   assertType({ content, filename }, 'string')
   config = Config(config)
 
   const cacheKey = hash(filename + content)
-  const filenameWithHash = config.bustCache ? filename + '?' + cacheKey : filename // source-map cache busting for hot-reloadded modules
+  const filenameWithHash = config.bustCache
+    ? filename + '?' + cacheKey
+    : filename // source-map cache busting for hot-reloadded modules
 
   if (cache.has(cacheKey)) return cache.get(cacheKey)
 

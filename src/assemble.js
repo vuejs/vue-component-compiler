@@ -13,8 +13,13 @@ const EXPORT_REGEX = /(export[\s\r\n]+default|module[\s\r\n]*\.exports[^=]*=)[\s
 function inlineStyle (name, style, config) {
   let output = `var ${name} = ${style.modules ? _s(style.modules) : '{}'}\n`
 
-  output += `${name}.__inject__ = function (context) {\n` +
-    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, [[${_s(config.shortFilePath)}, ${_s(style.code)}, ${_s(style.descriptor.attrs.media)}, ${_s(style.map)}]], ${config.isProduction}, context)\n` +
+  output +=
+    `${name}.__inject__ = function (context) {\n` +
+    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, [[${_s(
+      config.shortFilePath
+    )}, ${_s(style.code)}, ${_s(style.descriptor.attrs.media)}, ${_s(
+      style.map
+    )}]], ${config.isProduction}, context)\n` +
     `}\n`
 
   return output
@@ -33,41 +38,52 @@ const Source = struct({
     map: 'object?',
     descriptor: struct.union(['object', 'null'])
   },
-  styles: struct.list([{
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    modules: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }]),
-  customBlocks: struct.list([{
-    id: 'string?',
-    code: 'string?',
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }])
+  styles: struct.list([
+    {
+      id: struct.union(['string?', 'null']),
+      code: struct.union(['string?', 'null']),
+      map: 'object?',
+      modules: 'object?',
+      descriptor: struct.union(['object', 'null'])
+    }
+  ]),
+  customBlocks: struct.list([
+    {
+      id: 'string?',
+      code: 'string?',
+      map: 'object?',
+      descriptor: struct.union(['object', 'null'])
+    }
+  ])
 })
-const Config = any => defaultsdeep(struct({
-  esModule: 'boolean?',
-  require: 'object?',
-  scopeId: 'string?',
-  moduleIdentifier: 'string?',
-  isServer: 'boolean?',
-  isProduction: 'boolean?',
-  hasStyleInjectFn: 'boolean?',
-  onWarn: 'function?'
-})(any), {
-  esModule: true,
-  require: {
-    normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component',
-    injectStyleClient: 'vue-component-compiler/src/runtime/inject-style-client',
-    injectStyleServer: 'vue-component-compiler/src/runtime/inject-style-server'
-  },
-  isServer: false,
-  isProduction: true,
-  hasStyleInjectFn: false,
-  onWarn: () => message => console.warn(message)
-})
+const Config = any =>
+  defaultsdeep(
+    struct({
+      esModule: 'boolean?',
+      require: 'object?',
+      scopeId: 'string?',
+      moduleIdentifier: 'string?',
+      isServer: 'boolean?',
+      isProduction: 'boolean?',
+      hasStyleInjectFn: 'boolean?',
+      onWarn: 'function?'
+    })(any),
+    {
+      esModule: true,
+      require: {
+        normalizeComponent:
+          'vue-component-compiler/src/runtime/normalize-component',
+        injectStyleClient:
+          'vue-component-compiler/src/runtime/inject-style-client',
+        injectStyleServer:
+          'vue-component-compiler/src/runtime/inject-style-server'
+      },
+      isServer: false,
+      isProduction: true,
+      hasStyleInjectFn: false,
+      onWarn: () => message => console.warn(message)
+    }
+  )
 
 module.exports = function assemble (source, filename, config) {
   assertType({ filename }, 'string')
@@ -86,13 +102,17 @@ module.exports = function assemble (source, filename, config) {
 
     // Import style injector.
     output += importStatement(
-      config.isServer ? config.require.injectStyleServer : config.require.injectStyleClient,
+      config.isServer
+        ? config.require.injectStyleServer
+        : config.require.injectStyleClient,
       { name: STYLE_INJECTOR_IDENTIFIER, esModule: config.esModule }
     )
     styles.forEach((style, i) => {
       const IMPORT_NAME = `__vue_style_${i}__`
-      const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
-      const needsNamedImport = config.hasStyleInjectFn || typeof moduleName === 'string'
+      const moduleName =
+        style.descriptor.module === true ? '$style' : style.descriptor.module
+      const needsNamedImport =
+        config.hasStyleInjectFn || typeof moduleName === 'string'
       const runInjection = `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(context)\n`
 
       if (typeof style.code === 'string') {
@@ -116,12 +136,20 @@ module.exports = function assemble (source, filename, config) {
           })
         } else {
           cssModules[moduleName] = true
-          styleInjectionCode += `__vue_css_modules__[${_s(moduleName)}] = ${IMPORT_NAME}\n` +
-          `Object.defineProperty(this, ${_s(moduleName)}, { get: function () { return __vue_css_modules__[${_s(moduleName)}] }})\n`
+          styleInjectionCode +=
+            `__vue_css_modules__[${_s(moduleName)}] = ${IMPORT_NAME}\n` +
+            `Object.defineProperty(this, ${_s(
+              moduleName
+            )}, { get: function () { return __vue_css_modules__[${_s(
+              moduleName
+            )}] }})\n`
         }
       }
     })
-    output += `function ${STYLE_IDENTIFIER} (context) {\n` + pad(styleInjectionCode) + `}\n`
+    output +=
+      `function ${STYLE_IDENTIFIER} (context) {\n` +
+      pad(styleInjectionCode) +
+      `}\n`
   }
 
   // we require the component normalizer function, and call it like so:
@@ -138,7 +166,10 @@ module.exports = function assemble (source, filename, config) {
   })
   // <script>
   if (typeof script.code === 'string') {
-    output += '\n/* script */\n' + script.code.replace(EXPORT_REGEX, '\nvar __vue_script__ = ') + '\n'
+    output +=
+      '\n/* script */\n' +
+      script.code.replace(EXPORT_REGEX, '\nvar __vue_script__ = ') +
+      '\n'
   } else {
     output += importStatement(script.id, {
       esModule: config.esModule,
@@ -151,10 +182,11 @@ module.exports = function assemble (source, filename, config) {
 
   // <template>
   if (typeof render.code === 'string') {
-    output += `\n/* template */\n` +
-      `var __vue_template__ = (function () {\n${
-        pad(render.code.replace(EXPORT_REGEX, 'return ').trim())
-      }})()\n`
+    output +=
+      `\n/* template */\n` +
+      `var __vue_template__ = (function () {\n${pad(
+        render.code.replace(EXPORT_REGEX, 'return ').trim()
+      )}})()\n`
   } else {
     output += importStatement(render.id, {
       esModule: config.esModule,
@@ -164,34 +196,49 @@ module.exports = function assemble (source, filename, config) {
 
   // template functional
   output += '\n/* template functional */\n'
-  output += 'var __vue_template_functional__ = ' + (render.descriptor && render.descriptor.attrs && render.descriptor.attrs.functional ? 'true' : 'false') + '\n'
+  output +=
+    'var __vue_template_functional__ = ' +
+    (render.descriptor &&
+    render.descriptor.attrs &&
+    render.descriptor.attrs.functional
+      ? 'true'
+      : 'false') +
+    '\n'
 
   // style
   output += '\n/* styles */\n'
-  output += 'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
+  output +=
+    'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
 
   // scopeId
   output += '\n/* scopeId */\n'
-  output += 'var __vue_scopeId__ = ' + (hasScoped ? _s(config.scopeId) : 'null') + '\n'
+  output +=
+    'var __vue_scopeId__ = ' + (hasScoped ? _s(config.scopeId) : 'null') + '\n'
 
   // moduleIdentifier (server only)
   output += '\n/* moduleIdentifier (server only) */\n'
-  output += 'var __vue_module_identifier__ = ' + (config.isServer ? _s(config.moduleIdentifier) : 'null') + '\n'
+  output +=
+    'var __vue_module_identifier__ = ' +
+    (config.isServer ? _s(config.moduleIdentifier) : 'null') +
+    '\n'
 
   // close normalizeComponent call
-  output += `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
-  '  __vue_script__,\n' +
-  '  __vue_template__,\n' +
-  '  __vue_template_functional__,\n' +
-  '  __vue_styles__,\n' +
-  '  __vue_scopeId__,\n' +
-  '  __vue_module_identifier__\n' +
-  ')\n'
+  output +=
+    `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
+    '  __vue_script__,\n' +
+    '  __vue_template__,\n' +
+    '  __vue_template_functional__,\n' +
+    '  __vue_styles__,\n' +
+    '  __vue_scopeId__,\n' +
+    '  __vue_module_identifier__\n' +
+    ')\n'
 
   // development-only code
   if (!config.isProduction) {
     // add filename in dev
-    output += `${COMPONENT_IDENTIFIER}.options.__file = ${_s(config.shortFilePath)}\n`
+    output += `${COMPONENT_IDENTIFIER}.options.__file = ${_s(
+      config.shortFilePath
+    )}\n`
   }
 
   if (customBlocks.length) {
@@ -218,5 +265,11 @@ module.exports = function assemble (source, filename, config) {
 }
 
 function pad (content) {
-  return content.trim().split('\n').map(line => '  ' + line).join('\n') + '\n'
+  return (
+    content
+      .trim()
+      .split('\n')
+      .map(line => '  ' + line)
+      .join('\n') + '\n'
+  )
 }

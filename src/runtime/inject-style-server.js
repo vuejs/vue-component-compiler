@@ -71,9 +71,14 @@ function renderStyles (styles) {
   var css = ''
   for (const key in styles) {
     const style = styles[key]
-    css += '<style data-vue-ssr-id="' + style.ids.join(' ') + '"' +
-        (style.media ? (' media="' + style.media + '"') : '') + '>' +
-        style.css + '</style>'
+    css +=
+      '<style data-vue-ssr-id="' +
+      style.ids.join(' ') +
+      '"' +
+      (style.media ? ' media="' + style.media + '"' : '') +
+      '>' +
+      style.css +
+      '</style>'
   }
   return css
 }
