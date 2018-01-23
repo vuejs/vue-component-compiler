@@ -268,7 +268,7 @@ function pad (content) {
   return (
     content
       .trim()
-      .split('\n')
+      .split(/\n\r?/)
       .map(line => '  ' + line)
       .join('\n') + '\n'
   )
