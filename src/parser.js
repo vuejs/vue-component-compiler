@@ -1,4 +1,4 @@
-const compiler = require('vue-template-compiler/build.js')
+const compiler = require('vue-template-compiler')
 const { struct } = require('superstruct')
 const LRU = require('lru-cache')
 const hash = require('hash-sum')
@@ -13,39 +13,35 @@ const emptyRE = /^(?:\/\/)?\s*$/
 const Config = struct(
   {
     needMap: 'boolean?',
-    bustCache: 'boolean?'
+    needCSSMap: 'boolean?'
   },
   {
     needMap: true,
-    bustCache: false
+    needCSSMap: false
   }
 )
 
-module.exports = function (content, filename, config) {
+module.exports = function parse (content, filename, config) {
   assertType({ content, filename }, 'string')
   config = Config(config)
 
   const cacheKey = hash(filename + content)
-  const filenameWithHash = config.bustCache
-    ? filename + '?' + cacheKey
-    : filename // source-map cache busting for hot-reloadded modules
-
   if (cache.has(cacheKey)) return cache.get(cacheKey)
 
   const output = compiler.parseComponent(content, { pad: 'line' })
   if (config.needMap) {
     if (output.script && !output.script.src) {
       output.script.map = generateSourceMap(
-        filenameWithHash,
+        filename,
         content,
         output.script.content
       )
     }
-    if (output.styles) {
+    if (config.needCSSMap && output.styles) {
       output.styles.forEach(style => {
         if (!style.src) {
           style.map = generateSourceMap(
-            filenameWithHash,
+            filename,
             content,
             style.content
           )
