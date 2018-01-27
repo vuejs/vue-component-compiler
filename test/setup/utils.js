@@ -4,7 +4,7 @@ const commonjs = require('rollup-plugin-commonjs')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const image = require('rollup-plugin-image')
 const { readFileSync } = require('fs')
-const { join, resolve } = require('path')
+const { resolve } = require('path')
 const defaultsdeep = require('lodash.defaultsdeep')
 const compiler = require('../..')
 
@@ -68,7 +68,7 @@ function compile (filename, source, options = {}) {
       injectStyleClient: resolve(__dirname, '../../src/runtime/inject-style-client.js'),
       injectStyleServer: resolve(__dirname, '../../src/runtime/inject-style-server.js')
     }
-  }), options.assemble)
+  }, options.assemble))
 }
 
 const babelit = babel({
