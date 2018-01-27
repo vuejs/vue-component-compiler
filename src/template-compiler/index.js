@@ -1,12 +1,13 @@
-const compiler = require('vue-template-compiler/build.js')
-const transpile = require('vue-template-es2015-compiler')
+const pad = require('../utils/pad')
 const prettier = require('prettier')
 const { struct } = require('superstruct')
 const defaultsdeep = require('lodash.defaultsdeep')
+const transpile = require('vue-template-es2015-compiler')
+const compiler = require('vue-template-compiler/build.js')
 
-const transformRequire = require('./modules/transform-require')
-const transformSrcset = require('./modules/transform-srcset')
 const assertType = require('../utils/assert-type')
+const transformSrcset = require('./modules/transform-srcset')
+const transformRequire = require('./modules/transform-require')
 
 const Template = struct({
   code: 'string',
@@ -14,35 +15,39 @@ const Template = struct({
   descriptor: 'object'
 })
 
-const Config = any => defaultsdeep(struct({
-  scopeId: 'string',
-  isServer: 'boolean?',
-  isProduction: 'boolean?',
-  esModule: 'boolean?',
-  optimizeSSR: 'boolean?',
-  buble: 'object?',
-  options: 'object?',
-  transformRequire: 'object?',
-  plugins: 'array?'
-})(any), {
-  isServer: false,
-  esModule: true,
-  isProduction: true,
-  optimizeSSR: true,
-  buble: {
-    transforms: {
-      stripWith: true,
-      stripWithFunctional: false
+const Config = any =>
+  defaultsdeep(
+    struct({
+      scopeId: 'string',
+      isServer: 'boolean?',
+      isProduction: 'boolean?',
+      esModule: 'boolean?',
+      optimizeSSR: 'boolean?',
+      buble: 'object?',
+      options: 'object?',
+      transformRequire: 'object?',
+      plugins: 'array?'
+    })(any),
+    {
+      isServer: false,
+      esModule: true,
+      isProduction: true,
+      optimizeSSR: true,
+      buble: {
+        transforms: {
+          stripWith: true,
+          stripWithFunctional: false
+        }
+      },
+      options: {
+        preserveWhitespace: true,
+        comments: true,
+        modules: [],
+        directives: []
+      },
+      plugins: []
     }
-  },
-  options: {
-    preserveWhitespace: true,
-    comments: true,
-    modules: [],
-    directives: []
-  },
-  plugins: []
-})
+  )
 
 module.exports = function compileTemplate (template, filename, config) {
   assertType({ filename }, 'string')
@@ -52,14 +57,15 @@ module.exports = function compileTemplate (template, filename, config) {
   const options = config.options
 
   options.scopeId = config.scopeId
-  options.modules = [].concat(
-    options.modules || [],
-    config.plugins || [], [
-      transformRequire(config.transformToRequire),
-      transformSrcset()
-    ])
+  options.modules = [].concat(options.modules || [], config.plugins || [], [
+    transformRequire(config.transformToRequire),
+    transformSrcset
+  ])
 
-  const compile = (config.isServer && config.optimizeSSR !== false && compiler.ssrCompile) ? compiler.ssrCompile : compiler.compile
+  const compile =
+    config.isServer && config.optimizeSSR !== false && compiler.ssrCompile
+      ? compiler.ssrCompile
+      : compiler.compile
   const compiled = compile(template.code, options)
   const output = {
     errors: compiled.errors,
@@ -69,21 +75,25 @@ module.exports = function compileTemplate (template, filename, config) {
   if (output.errors && output.errors.length) {
     output.code = `function render () {}\nvar staticRenderFns = []\n`
   } else {
-    const stripWithFunctional = template.descriptor.attrs && template.descriptor.attrs.functional
+    const stripWithFunctional =
+      template.descriptor.attrs && template.descriptor.attrs.functional
 
     config.buble.transforms.stripWithFunctional = stripWithFunctional
 
     output.code = transpile(
-      'var render = ' + toFunction(compiled.render, stripWithFunctional) + '\n' +
-      'var staticRenderFns = [' + compiled.staticRenderFns.map(it => toFunction(it, stripWithFunctional)).join(',') + ']\n',
+      'var render = ' +
+        toFunction(compiled.render, stripWithFunctional) +
+        '\n' +
+        'var staticRenderFns = [' +
+        compiled.staticRenderFns
+          .map(it => toFunction(it, stripWithFunctional))
+          .join(',') +
+        ']\n',
       config.buble
     )
 
     // mark with stripped (this enables Vue to use correct runtime proxy detection)
-    if (
-      !config.isProduction &&
-      config.buble.transforms.stripWith !== false
-    ) {
+    if (!config.isProduction && config.buble.transforms.stripWith !== false) {
       output.code += `render._withStripped = true\n`
     }
   }
@@ -99,6 +109,6 @@ module.exports = function compileTemplate (template, filename, config) {
 
 function toFunction (code, stripWithFunctional) {
   return `function (${stripWithFunctional ? '_h,_vm' : ''}) {\n  ${
-    prettier.format(code).split(/\r?\n/).map(it => '  ' + it).join('\n')
-  }\n}`
+    pad(prettier.format(code))
+  }}`
 }

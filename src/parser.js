@@ -1,46 +1,46 @@
-const compiler = require('vue-template-compiler/build.js')
-const { struct } = require('superstruct')
 const LRU = require('lru-cache')
 const hash = require('hash-sum')
-const { SourceMapGenerator } = require('source-map')
-
+const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
+const compiler = require('vue-template-compiler')
+const { SourceMapGenerator } = require('source-map')
 
 const cache = LRU(100)
 const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 
-const Config = struct({
-  needMap: 'boolean?',
-  bustCache: 'boolean?'
-}, {
-  needMap: true,
-  bustCache: false
-})
+const Config = struct(
+  {
+    needMap: 'boolean?',
+    needCSSMap: 'boolean?'
+  },
+  {
+    needMap: true,
+    needCSSMap: true
+  }
+)
 
-module.exports = function (content, filename, config) {
+module.exports = function parse (content, filename, config) {
   assertType({ content, filename }, 'string')
   config = Config(config)
 
   const cacheKey = hash(filename + content)
-  const filenameWithHash = config.bustCache ? filename + '?' + cacheKey : filename // source-map cache busting for hot-reloadded modules
-
   if (cache.has(cacheKey)) return cache.get(cacheKey)
 
   const output = compiler.parseComponent(content, { pad: 'line' })
   if (config.needMap) {
     if (output.script && !output.script.src) {
       output.script.map = generateSourceMap(
-        filenameWithHash,
+        filename,
         content,
         output.script.content
       )
     }
-    if (output.styles) {
+    if (config.needCSSMap && output.styles) {
       output.styles.forEach(style => {
         if (!style.src) {
           style.map = generateSourceMap(
-            filenameWithHash,
+            filename,
             content,
             style.content
           )

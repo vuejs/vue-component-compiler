@@ -1,25 +1,31 @@
-const { struct } = require('superstruct')
-const defaultsdeep = require('lodash.defaultsdeep')
+const pad = require('./utils/pad')
 const _s = require('./utils/stringify')
-const importStatement = require('./utils/import-statement')
+const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
+const defaultsdeep = require('lodash.defaultsdeep')
+const importStatement = require('./utils/import-statement')
 
-const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
-const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
+const VUE = `__vue__`
+const HOT_API = `__vue_hot_api__`
+const IS_DISPOSED = '__vue_disposed__'
+const CSS_MODULES = '__vue_css_modules__'
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
-const CSS_MODULES = '__vue_css_modules__'
-const IS_DISPOSED = '__vue_disposed__'
-const HOT_API = `__vue_hot_api__`
-const VUE = `__vue__`
+const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
+const NORMALIZE_COMPONENT_IDENTIFIER = '__vue_normalize_component__'
 
 const EXPORT_REGEX = /(export[\s\r\n]+default|module[\s\r\n]*\.exports[^=]*=)[\s\r\n]*/
 
 function inlineStyle (name, style, config) {
   let output = `var ${name} = ${style.modules ? _s(style.modules) : '{}'}\n`
 
-  output += `${name}.__inject__ = function (context) {\n` +
-    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, [[${_s(config.shortFilePath)}, ${_s(style.code)}, ${_s(style.descriptor.attrs.media)}, ${_s(style.map)}]], ${config.isProduction}, context)\n` +
+  output +=
+    `${name}.__inject__ = function (context) {\n` +
+    `  ${STYLE_INJECTOR_IDENTIFIER}(${_s(config.shortFilePath)}, [[${_s(
+      config.shortFilePath
+    )}, ${_s(style.code)}, ${_s(style.descriptor.attrs.media)}, ${_s(
+      style.map
+    )}]], ${config.isProduction}, context)\n` +
     `}\n`
 
   return output
@@ -88,6 +94,7 @@ const defaultHotAPI = {
   dispose: code => `module.hot.dispose(${code})\n`
 }
 
+
 module.exports = function assemble (source, filename, config) {
   assertType({ filename }, 'string')
   config = Config(config)
@@ -114,13 +121,17 @@ module.exports = function assemble (source, filename, config) {
 
     // Import style injector.
     output += importStatement(
-      config.isServer ? config.require.injectStyleServer : config.require.injectStyleClient,
+      config.isServer
+        ? config.require.injectStyleServer
+        : config.require.injectStyleClient,
       { name: STYLE_INJECTOR_IDENTIFIER, esModule: config.esModule }
     )
     styles.forEach((style, i) => {
       const IMPORT_NAME = `__vue_style_${i}__`
-      const moduleName = (style.descriptor.module === true) ? '$style' : style.descriptor.module
-      const needsNamedImport = config.hasStyleInjectFn || typeof moduleName === 'string'
+      const moduleName =
+        style.descriptor.module === true ? '$style' : style.descriptor.module
+      const needsNamedImport =
+        config.hasStyleInjectFn || typeof moduleName === 'string'
       const runInjection = `${IMPORT_NAME} && ${IMPORT_NAME}.__inject__ && ${IMPORT_NAME}.__inject__(context)\n`
       const isInline = typeof style.code === 'string'
 
@@ -172,7 +183,10 @@ module.exports = function assemble (source, filename, config) {
         }
       }
     })
-    output += `function ${STYLE_IDENTIFIER} (context) {\n` + pad(styleInjectionCode) + `}\n`
+    output +=
+      `function ${STYLE_IDENTIFIER} (context) {\n` +
+      pad(styleInjectionCode) +
+      `}\n`
   }
 
   // we require the component normalizer function, and call it like so:
@@ -189,7 +203,10 @@ module.exports = function assemble (source, filename, config) {
   })
   // <script>
   if (typeof script.code === 'string') {
-    output += '\n/* script */\n' + script.code.replace(EXPORT_REGEX, '\nvar __vue_script__ = ') + '\n'
+    output +=
+      '\n/* script */\n' +
+      script.code.replace(EXPORT_REGEX, '\nvar __vue_script__ = ') +
+      '\n'
   } else {
     output += importStatement(script.id, {
       esModule: config.esModule,
@@ -202,10 +219,11 @@ module.exports = function assemble (source, filename, config) {
 
   // <template>
   if (typeof render.code === 'string') {
-    output += `\n/* template */\n` +
-      `var __vue_template__ = (function () {\n${
-        pad(render.code.replace(EXPORT_REGEX, 'return ').trim())
-      }})()\n`
+    output +=
+      `\n/* template */\n` +
+      `var __vue_template__ = (function () {\n${pad(
+        render.code.replace(EXPORT_REGEX, 'return ').trim()
+      )}})()\n`
   } else {
     output += importStatement(render.id, {
       esModule: config.esModule,
@@ -220,30 +238,38 @@ module.exports = function assemble (source, filename, config) {
 
   // style
   output += '\n/* styles */\n'
-  output += 'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
+  output +=
+    'var __vue_styles__ = ' + (styles.length ? STYLE_IDENTIFIER : 'null') + '\n'
 
   // scopeId
   output += '\n/* scopeId */\n'
-  output += 'var __vue_scopeId__ = ' + (hasScoped ? _s(config.scopeId) : 'null') + '\n'
+  output +=
+    'var __vue_scopeId__ = ' + (hasScoped ? _s(config.scopeId) : 'null') + '\n'
 
   // moduleIdentifier (server only)
   output += '\n/* moduleIdentifier (server only) */\n'
-  output += 'var __vue_module_identifier__ = ' + (config.isServer ? _s(config.moduleIdentifier) : 'null') + '\n'
+  output +=
+    'var __vue_module_identifier__ = ' +
+    (config.isServer ? _s(config.moduleIdentifier) : 'null') +
+    '\n'
 
   // close normalizeComponent call
-  output += `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
-  '  __vue_script__,\n' +
-  '  __vue_template__,\n' +
-  '  __vue_template_functional__,\n' +
-  '  __vue_styles__,\n' +
-  '  __vue_scopeId__,\n' +
-  '  __vue_module_identifier__\n' +
-  ')\n'
+  output +=
+    `\nvar ${COMPONENT_IDENTIFIER} = ${NORMALIZE_COMPONENT_IDENTIFIER}(\n` +
+    '  __vue_script__,\n' +
+    '  __vue_template__,\n' +
+    '  __vue_template_functional__,\n' +
+    '  __vue_styles__,\n' +
+    '  __vue_scopeId__,\n' +
+    '  __vue_module_identifier__\n' +
+    ')\n'
 
   // development-only code
   if (!config.isProduction) {
     // add filename in dev
-    output += `${COMPONENT_IDENTIFIER}.options.__file = ${_s(config.shortFilePath)}\n`
+    output += `${COMPONENT_IDENTIFIER}.options.__file = ${_s(
+      config.shortFilePath
+    )}\n`
   }
 
   if (customBlocks.length) {
@@ -289,8 +315,4 @@ module.exports = function assemble (source, filename, config) {
   }
 
   return output
-}
-
-function pad (content) {
-  return content.trim().split('\n').map(line => '  ' + line).join('\n') + '\n'
 }
