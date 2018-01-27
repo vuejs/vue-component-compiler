@@ -102,6 +102,22 @@ module.exports = function compileTemplate (template, filename, config) {
     output.code += `\nmodule.exports = ${__exports__}`
   } else {
     output.code += `\nexport default ${__exports__}`
+
+    // remove all require statements
+    const imports = []
+    output.code = output.code.replace(/\brequire\("([^"]+)"\)/g, (_, name) => {
+      let index = imports.indexOf(name)
+      if (index === -1) {
+        index = imports.length
+        imports.push(name)
+      }
+      const ref = `__vue_template_import_${index}__`
+
+      return ref
+    })
+    output.code =
+     imports.map((name, i) => `import __vue_template_import_${i}__ from '${name}'`).join('\n') +
+     '\n\n' + output.code
   }
 
   return output
