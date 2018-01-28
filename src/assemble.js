@@ -26,6 +26,25 @@ function inlineStyle (name, style, config) {
   return output
 }
 
+function inlineTemplate (render, config) {
+  const lines = render.code.split('\n')
+  let i = 0
+  while (lines[i].startsWith('import ')) {
+    i += 1
+  }
+
+  const imports = lines.slice(0, i).join('\n')
+  const code = lines.slice(i).join('\n')
+
+  return (
+    `\n/* template */\n` +
+    imports + '\n' +
+    `var __vue_template__ = (function () {\n${pad(
+      code.replace(EXPORT_REGEX, 'return ').trim()
+    )}})()\n`
+  )
+}
+
 const Source = struct({
   script: {
     id: struct.union(['string?', 'null']),
@@ -184,11 +203,7 @@ module.exports = function assemble (source, filename, config) {
 
   // <template>
   if (typeof render.code === 'string') {
-    output +=
-      `\n/* template */\n` +
-      `var __vue_template__ = (function () {\n${pad(
-        render.code.replace(EXPORT_REGEX, 'return ').trim()
-      )}})()\n`
+    output += inlineTemplate(render, config)
   } else {
     output += importStatement(render.id, {
       esModule: config.esModule,
