@@ -1,9 +1,9 @@
 const pad = require('./utils/pad')
 const _s = require('./utils/stringify')
-const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
-const defaultsdeep = require('lodash.defaultsdeep')
 const importStatement = require('./utils/import-statement')
+
+const { Config, Source } = require('./schema/assemble')
 
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
@@ -45,70 +45,25 @@ function inlineTemplate (render, config) {
   )
 }
 
-const Source = struct({
-  script: {
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
+const defaults = {
+  esModule: true,
+  require: {
+    normalizeComponent:
+      'vue-component-compiler/src/runtime/normalize-component',
+    injectStyleClient:
+      'vue-component-compiler/src/runtime/inject-style-client',
+    injectStyleServer:
+      'vue-component-compiler/src/runtime/inject-style-server'
   },
-  render: {
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  },
-  styles: struct.list([
-    {
-      id: struct.union(['string?', 'null']),
-      code: struct.union(['string?', 'null']),
-      map: 'object?',
-      modules: 'object?',
-      descriptor: struct.union(['object', 'null'])
-    }
-  ]),
-  customBlocks: struct.list([
-    {
-      id: 'string?',
-      code: 'string?',
-      map: 'object?',
-      descriptor: struct.union(['object', 'null'])
-    }
-  ])
-})
-
-const Config = any =>
-  defaultsdeep(
-    struct({
-      esModule: 'boolean?',
-      require: 'object?',
-      scopeId: 'string?',
-      moduleIdentifier: 'string?',
-      isServer: 'boolean?',
-      isProduction: 'boolean?',
-      hasStyleInjectFn: 'boolean?',
-      onWarn: 'function?'
-    })(any),
-    {
-      esModule: true,
-      require: {
-        normalizeComponent:
-          'vue-component-compiler/src/runtime/normalize-component',
-        injectStyleClient:
-          'vue-component-compiler/src/runtime/inject-style-client',
-        injectStyleServer:
-          'vue-component-compiler/src/runtime/inject-style-server'
-      },
-      isServer: false,
-      isProduction: true,
-      hasStyleInjectFn: false,
-      onWarn: () => message => console.warn(message)
-    }
-  )
+  isServer: false,
+  isProduction: true,
+  hasStyleInjectFn: false,
+  onWarn: () => message => console.warn(message)
+}
 
 module.exports = function assemble (source, filename, config) {
   assertType({ filename }, 'string')
-  config = Config(config)
+  config = Config(config, defaults)
   source = Source(source)
 
   let output = ''
