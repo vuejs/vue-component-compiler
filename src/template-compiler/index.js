@@ -8,51 +8,32 @@ const compiler = require('vue-template-compiler/build.js')
 const assertType = require('../utils/assert-type')
 const transformSrcset = require('./modules/transform-srcset')
 const transformRequire = require('./modules/transform-require')
+const { Config, Source } = require('../schema/template-compiler')
 
-const Template = struct({
-  code: 'string',
-  map: 'object?',
-  descriptor: 'object'
-})
-
-const Config = any =>
-  defaultsdeep(
-    struct({
-      scopeId: 'string',
-      isServer: 'boolean?',
-      isProduction: 'boolean?',
-      esModule: 'boolean?',
-      optimizeSSR: 'boolean?',
-      buble: 'object?',
-      options: 'object?',
-      transformRequire: 'object?',
-      plugins: 'array?'
-    })(any),
-    {
-      isServer: false,
-      esModule: true,
-      isProduction: true,
-      optimizeSSR: true,
-      buble: {
-        transforms: {
-          stripWith: true,
-          stripWithFunctional: false
-        }
-      },
-      options: {
-        preserveWhitespace: true,
-        comments: true,
-        modules: [],
-        directives: []
-      },
-      plugins: []
+const defaults = {
+  isServer: false,
+  esModule: true,
+  isProduction: true,
+  optimizeSSR: true,
+  buble: {
+    transforms: {
+      stripWith: true,
+      stripWithFunctional: false
     }
-  )
+  },
+  options: {
+    preserveWhitespace: true,
+    comments: true,
+    modules: [],
+    directives: []
+  },
+  plugins: []
+}
 
 module.exports = function compileTemplate (template, filename, config) {
   assertType({ filename }, 'string')
-  template = Template(template)
-  config = Config(config)
+  template = Source(template)
+  config = Config(config, defaults)
 
   const options = config.options
 
