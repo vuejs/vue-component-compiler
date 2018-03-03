@@ -269,7 +269,7 @@ module.exports = function assemble (source, filename, config) {
     output += '\n/* hot reload */\n' +
       hot.isHot(
         `${HOT_API}.install(${VUE}, false)\n` +
-        `if (${HOT_API}.compatible) return\n` +
+        `if (!${HOT_API}.compatible) return\n` +
         `var __vue_next_css_modules__\n` +
         `${HOT_API}.createRecord(${_s(config.moduleIdentifier)}, ${COMPONENT_IDENTIFIER}.options)\n` +
         hot.accept('function () {\n' +
