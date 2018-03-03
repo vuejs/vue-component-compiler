@@ -1,14 +1,15 @@
 const pad = require('./utils/pad')
 const _s = require('./utils/stringify')
-const { struct } = require('superstruct')
 const assertType = require('./utils/assert-type')
-const defaultsdeep = require('lodash.defaultsdeep')
 const importStatement = require('./utils/import-statement')
+
+const { Config, Source } = require('./schema/assemble')
 
 const VUE = `__vue__`
 const HOT_API = `__vue_hot_api__`
 const IS_DISPOSED = '__vue_disposed__'
 const CSS_MODULES = '__vue_css_modules__'
+
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
 const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
@@ -31,62 +32,41 @@ function inlineStyle (name, style, config) {
   return output
 }
 
-const Source = struct({
-  script: struct.optional({
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }),
-  render: struct.optional({
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }),
-  styles: struct.optional(struct.list([{
-    id: struct.union(['string?', 'null']),
-    code: struct.union(['string?', 'null']),
-    map: 'object?',
-    modules: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }])),
-  customBlocks: struct.optional(struct.list([{
-    id: 'string?',
-    code: 'string?',
-    map: 'object?',
-    descriptor: struct.union(['object', 'null'])
-  }]))
-})
-const Config = any => defaultsdeep(struct({
-  esModule: 'boolean?',
-  require: 'object?',
-  scopeId: 'string?',
-  moduleIdentifier: 'string?',
-  hot: struct.optional({
-    isHot: 'function?',
-    accept: 'function?',
-    dispose: 'function?'
-  }),
-  isHot: 'boolean?',
-  isServer: 'boolean?',
-  isProduction: 'boolean?',
-  hasStyleInjectFn: 'boolean?',
-  onWarn: 'function?'
-})(any), {
+function inlineTemplate (render, config) {
+  const lines = render.code.split('\n')
+  let i = 0
+  while (lines[i].startsWith('import ')) {
+    i += 1
+  }
+
+  const imports = lines.slice(0, i).join('\n')
+  const code = lines.slice(i).join('\n')
+
+  return (
+    `\n/* template */\n` +
+    imports + '\n' +
+    `var __vue_template__ = (function () {\n${pad(
+      code.replace(EXPORT_REGEX, 'return ').trim()
+    )}})()\n`
+  )
+}
+
+const defaults = {
   esModule: true,
   require: {
     hotReloadAPI: 'vue-hot-reload-api',
-    normalizeComponent: 'vue-component-compiler/src/runtime/normalize-component',
-    injectStyleClient: 'vue-component-compiler/src/runtime/inject-style-client',
-    injectStyleServer: 'vue-component-compiler/src/runtime/inject-style-server'
+    normalizeComponent:
+      'vue-component-compiler/src/runtime/normalize-component',
+    injectStyleClient:
+      'vue-component-compiler/src/runtime/inject-style-client',
+    injectStyleServer:
+      'vue-component-compiler/src/runtime/inject-style-server'
   },
-  isHot: false,
   isServer: false,
   isProduction: true,
   hasStyleInjectFn: false,
   onWarn: () => message => console.warn(message)
-})
+}
 
 const defaultHotAPI = {
   isHot: code => `if (module.hot) {\n${pad(code)}\n}`,
@@ -94,10 +74,9 @@ const defaultHotAPI = {
   dispose: code => `module.hot.dispose(${code})\n`
 }
 
-
 module.exports = function assemble (source, filename, config) {
   assertType({ filename }, 'string')
-  config = Config(config)
+  config = Config(config, defaults)
   source = Source(source)
   config.moduleIdentifier = config.moduleIdentifier || config.scopeId
   const hot = Object.assign({}, defaultHotAPI, config.hot)
@@ -219,11 +198,7 @@ module.exports = function assemble (source, filename, config) {
 
   // <template>
   if (typeof render.code === 'string') {
-    output +=
-      `\n/* template */\n` +
-      `var __vue_template__ = (function () {\n${pad(
-        render.code.replace(EXPORT_REGEX, 'return ').trim()
-      )}})()\n`
+    output += inlineTemplate(render, config)
   } else {
     output += importStatement(render.id, {
       esModule: config.esModule,

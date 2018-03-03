@@ -1,41 +1,23 @@
 const postcss = require('postcss')
-const { struct } = require('superstruct')
-const defaultsdeep = require('lodash.defaultsdeep')
 const { default: cssModules } = require('postcss-modules-sync')
 
 const trim = require('./plugins/trim')
 const scopeId = require('./plugins/scope-id')
 const assertType = require('../utils/assert-type')
+const { Config, Source } = require('../schema/style-compiler')
 
-const Style = struct({
-  code: 'string',
-  map: 'object?',
-  descriptor: 'object'
-})
-
-const Config = any =>
-  defaultsdeep(
-    struct({
-      async: 'boolean?',
-      needMap: 'boolean?',
-      onWarn: 'function?',
-      options: 'object?',
-      plugins: 'array?',
-      scopeId: 'string'
-    })(any),
-    {
-      async: false,
-      needMap: true,
-      onWarn: () => message => console.warn(message),
-      options: {},
-      plugins: []
-    }
-  )
+const defaults = {
+  async: false,
+  needMap: true,
+  onWarn: () => message => console.warn(message),
+  options: {},
+  plugins: []
+}
 
 module.exports = function compileStyle (style, filename, config) {
   assertType({ filename }, 'string')
-  style = Style(style)
-  config = Config(config)
+  style = Source(style)
+  config = Config(config, defaults)
 
   const plugins = [trim].concat(config.plugins)
   const options = Object.assign(
