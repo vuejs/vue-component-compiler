@@ -9,7 +9,6 @@ const VUE = `__vue__`
 const HOT_API = `__vue_hot_api__`
 const IS_DISPOSED = '__vue_disposed__'
 const CSS_MODULES = '__vue_css_modules__'
-
 const STYLE_IDENTIFIER = '__vue_inject_style__'
 const COMPONENT_IDENTIFIER = '__vue_component__'
 const STYLE_INJECTOR_IDENTIFIER = '__vue_style_injector__'
@@ -67,7 +66,6 @@ const defaults = {
   hasStyleInjectFn: false,
   onWarn: () => message => console.warn(message)
 }
-
 const defaultHotAPI = {
   isHot: code => `if (module.hot) {\n${pad(code)}\n}`,
   accept: code => `module.hot.accept(${code})\n`,
