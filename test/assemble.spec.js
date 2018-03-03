@@ -1,4 +1,6 @@
 import { mount } from '@vue/test-utils'
+import { compile } from './setup/utils'
+import { resolve } from 'path'
 
 // Fixtures
 import Transform from './fixtures/with-template-require-transform.vue'
@@ -65,4 +67,14 @@ test('template comments', () => {
   expect(wrapper.find('h2#test')).toBeTruthy()
   expect(wrapper.vnode.children[1].isComment).toEqual(true)
   expect(wrapper.vnode.children[1].text).toEqual(expect.stringContaining('comment here'))
+})
+
+test('hot enabled', () => {
+  const output = compile(resolve(__dirname, './fixtures/basic.vue'), undefined, { assemble: { isHot: true }})
+  expect(output).toEqual(expect.stringContaining('vue-hot-reload-api'))
+})
+
+test('hot disabled', () => {
+  const output = compile(resolve(__dirname, './fixtures/basic.vue'), undefined, { assemble: { isHot: false }})
+  expect(output).not.toEqual(expect.stringContaining('vue-hot-reload-api'))
 })

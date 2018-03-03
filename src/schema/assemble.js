@@ -38,6 +38,12 @@ const ConfigStruct = struct.partial({
   require: 'object',
   scopeId: 'string',
   moduleIdentifier: 'string?',
+  hot: struct.optional({
+    isHot: 'function?',
+    accept: 'function?',
+    dispose: 'function?'
+  }),
+  isHot: 'boolean?',
   isServer: 'boolean',
   isProduction: 'boolean',
   hasStyleInjectFn: 'boolean',

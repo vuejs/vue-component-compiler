@@ -68,7 +68,7 @@ function compile (filename, source, options = {}) {
       injectStyleClient: resolve(__dirname, '../../src/runtime/inject-style-client.js'),
       injectStyleServer: resolve(__dirname, '../../src/runtime/inject-style-server.js')
     }
-  }), options.assemble)
+  }, options.assemble))
 }
 
 const babelit = babel({
