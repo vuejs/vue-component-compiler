@@ -1,12 +1,9 @@
 module.exports = {
-  moduleFileExtensions: [
-    'js',
-    'json',
-    'png',
-    'vue'
-  ],
+  moduleFileExtensions: ['js', 'json', 'png', 'ts', 'vue'],
   transform: {
-    '.*\.(js|vue|png)$': './test/setup/jest-helper.js'
+    '^.+\\.js$': 'babel-jest',
+    '^.+\\.ts$': '<rootDir>/node_modules/ts-jest/preprocessor.js',
+    '.*.(js|vue|png)$': './test/setup/jest-helper.js'
   },
-  testRegex: '.*\.spec.js'
+  testMatch: ['**/?(*.)(spec|test).ts']
 }

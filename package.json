@@ -2,12 +2,6 @@
   "name": "vue-component-compiler",
   "version": "3.0.0",
   "description": "bundler agnostic API for compiling Vue SFC",
-  "main": "src/index.js",
-  "scripts": {
-    "test": "jest --config jest.config.js",
-    "lint": "eslint src test",
-    "lint:fix": "eslint src test --fix"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vuejs/vue-component-compiler.git"
@@ -17,45 +11,43 @@
     "compiler",
     "sfc"
   ],
-  "author": "Evan You",
+  "author": "Rahul Kadyan",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/vuejs/vue-component-compiler/issues"
   },
-  "typings": "index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "pretest": "npm run build",
+    "test": "jest",
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
   "homepage": "https://github.com/vuejs/vue-component-compiler#readme",
   "devDependencies": {
-    "@vue/test-utils": "^1.0.0-beta.10",
+    "@types/node": "^9.4.7",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
-    "eslint": "^3.19.0",
-    "eslint-plugin-vue-libs": "^1.2.0",
-    "jest": "^22.1.1",
-    "puppeteer": "^0.13.0",
-    "rollup": "^0.53.4",
-    "rollup-plugin-babel": "^3.0.3",
-    "rollup-plugin-commonjs": "^8.2.6",
+    "jest": "^22.4.2",
+    "pug": "^2.0.3",
+    "puppeteer": "^1.3.0",
+    "rollup": "^0.58.2",
+    "rollup-plugin-babel": "^3.0.4",
+    "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-image": "^1.0.2",
-    "rollup-plugin-node-resolve": "^3.0.2",
-    "sugarss": "^1.0.1",
-    "vue": "^2.5.13"
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "ts-jest": "^22.4.2",
+    "typescript": "^2.7.2",
+    "vue": "^2.5.16",
+    "vue-template-compiler": "^2.5.16"
   },
   "peerDependencies": {
     "vue-template-compiler": "*"
   },
   "dependencies": {
+    "@vue/component-compiler-utils": "^1.1.0",
     "hash-sum": "^1.0.2",
-    "js-beautify": "^1.7.3",
-    "lodash.defaultsdeep": "^4.6.0",
-    "lru-cache": "^4.1.1",
-    "postcss": "^6.0.12",
-    "postcss-modules-sync": "^1.0.0",
-    "postcss-selector-parser": "^2.2.3",
-    "prettier": "^1.10.2",
-    "source-map": "^0.6.1",
-    "superstruct": "^0.5.0",
-    "vue-hot-reload-api": "^2.1.0",
-    "vue-template-compiler": "^2.5.13",
-    "vue-template-es2015-compiler": "^1.6.0"
+    "postcss-modules-sync": "^1.0.0"
   }
 }
