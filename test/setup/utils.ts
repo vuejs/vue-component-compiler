@@ -165,7 +165,7 @@ async function open(name, browser, code, id = '#test') {
   </html>`
 
   // Un-comment following lines to debug generated HTML.
-  if (!process.env.CI) {
+  if (!Boolean(process.env.CI)) {
     const fs = require('fs')
     const path = require('path')
     const dir = path.join(__dirname, '../output')

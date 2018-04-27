@@ -11,7 +11,7 @@ const fixtures = readdirSync(join(__dirname, 'fixtures'))
 beforeAll(async () => {
   browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: !process.env.CI
+    headless: Boolean(process.env.CI)
   })
 })
 afterAll(async () => browser && (await browser.close()))
