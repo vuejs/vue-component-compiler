@@ -13,7 +13,7 @@ export interface AssembleResults {
   map?: any
 }
 
-export function assemble(
+export function assemble (
   compiler: SFCCompiler,
   filename: string,
   result: DescriptorCompileResult
@@ -22,18 +22,27 @@ export function assemble(
     filename,
     scopeId: result.scopeId,
     script: result.script && { source: result.script.code },
-    template: result.template && { source: result.template.code, functional: result.template.functional },
-    styles: result.styles.map(style => ({
-      source: style.code,
-      media: style.media,
-      scoped: style.scoped,
-      moduleName: style.moduleName,
-      module: style.module
-    }))
+    template: result.template && {
+      source: result.template.code,
+      functional: result.template.functional
+    },
+    styles: result.styles.map(style => {
+      if (style.errors.length) {
+        console.error(style.errors)
+      }
+
+      return {
+        source: style.code,
+        media: style.media,
+        scoped: style.scoped,
+        moduleName: style.moduleName,
+        module: style.module
+      }
+    })
   })
 }
 
-export function assembleFromSource(
+export function assembleFromSource (
   compiler: SFCCompiler,
   { filename, script, template, styles, scopeId }: AssembleSource
 ): AssembleResults {
@@ -50,10 +59,10 @@ ${template.source
     .replace('var staticRenderFns =', 'var __vue_staticRenderFns__ =')
     .replace('render._withStripped =', '__vue_render__._withStripped =')}
 const __vue_template__ = ${
-    template.source.includes('var render =')
-      ? '{ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }'
-      : '{ render() {} }'
-  }
+  template.source.includes('var render =')
+    ? '{ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }'
+    : '{ render() {} }'
+}
 /* style */
 const __vue_inject_styles__ = ${e(hasStyle)} ? function (context) {
 ${styles.map(
@@ -88,7 +97,9 @@ function __vue_normalize__(template, inject, script, scope, functional) {
     const call_inject = function(context) {
       inject((id, style) => {
         if (style.moduleName) {
-          if (${e(!compiler.template.isProduction)} && Object.prototype.hasOwnProperty.call(this, style.moduleName)) {
+          if (${e(
+    !compiler.template.isProduction
+  )} && Object.prototype.hasOwnProperty.call(this, style.moduleName)) {
             console.log('CSS module name (' + style.moduleName + ') is reserved.')
           } else Object.defineProperty(this, style.moduleName, {
             value: style.module
@@ -138,8 +149,8 @@ function __vue_normalize__(template, inject, script, scope, functional) {
           }
           const styles = context._styles || (context._styles = {})
           const groupId = ${e(
-            compiler.template.isProduction
-          )} ? style.media || 'default' : id
+    compiler.template.isProduction
+  )} ? style.media || 'default' : id
           const target = styles[groupId]
           if (target) {
             if (target.ids.indexOf(id) < 0) {

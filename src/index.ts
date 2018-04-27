@@ -10,9 +10,9 @@ export const createCompiler = ({
   style,
   template
 }: {
-  script: ScriptOptions
-  style: StyleOptions
-  template: TemplateOptions
+script: ScriptOptions
+style: StyleOptions
+template: TemplateOptions
 }) => new SFCCompiler(script, style, template)
 
 export const createDefaultCompiler = () =>

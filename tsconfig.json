@@ -15,5 +15,5 @@
     "removeComments": false,
     "lib": ["es6", "es7"]
   },
-  "include": ["src", "typings"]
+  "include": ["lib", "typings"]
 }

@@ -3,11 +3,11 @@
 </template>
 
 <script>
-  export default {
-    data () {
-      return { name: 'John Doe' }
-    }
+export default {
+  data () {
+    return { name: 'John Doe' }
   }
+}
 </script>
 
 <style lang="scss">

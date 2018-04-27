@@ -164,6 +164,7 @@ async function open(name, browser, code, id = '#test') {
     </body>
   </html>`
 
+  // Un-comment following lines to debug generated HTML.
   require('fs').writeFileSync(
     require('path').join(__dirname, '../output', name + '.html'),
     content
