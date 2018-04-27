@@ -165,10 +165,14 @@ async function open(name, browser, code, id = '#test') {
   </html>`
 
   // Un-comment following lines to debug generated HTML.
-  require('fs').writeFileSync(
-    require('path').join(__dirname, '../output', name + '.html'),
-    content
-  )
+  if (!process.env.CI) {
+    const fs = require('fs')
+    const path = require('path')
+    const dir = path.join(__dirname, '../output')
+
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+    fs.writeFileSync(path.join(dir, name + '.html'), content)
+  }
 
   await page.setContent(content)
 
