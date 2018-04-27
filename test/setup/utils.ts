@@ -67,7 +67,7 @@ const babelit = babel({
 
 async function pack(filename, source) {
   const name = filename + '__temp.js'
-  let bundle = await rollup({
+  let bundle = await rollup(<any>{
     input: name,
     plugins: [inline(name, compile(filename, source)), vue(), babelit]
   })
