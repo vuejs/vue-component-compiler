@@ -13,6 +13,7 @@ import {
 import { AssetURLOptions } from '@vue/component-compiler-utils/dist/templateCompilerModules/assetUrl'
 
 import postcssModules from 'postcss-modules-sync'
+import postcssClean from './postcss-clean'
 import hash = require('hash-sum')
 import * as fs from 'fs'
 import * as path from 'path'
@@ -32,6 +33,7 @@ export interface StyleOptions {
   postcssPlugins?: any[]
   postcssModulesOptions?: any
   preprocessOptions?: any
+  postcssCleanOptions?: any
   trim?: boolean
 }
 
@@ -103,18 +105,22 @@ export class SFCCompiler {
         map: style.map,
         scoped: style.scoped || false,
         postcssOptions: this.style.postcssOptions,
-        postcssPlugins: (needsCSSModules
-          ? [
-              postcssModules({
+        postcssPlugins: [
+          needsCSSModules
+            ? postcssModules({
                 generateScopedName: '[path][local]-[hash:base64:4]',
                 ...this.style.postcssModulesOptions,
                 getJSON: (t: any) => {
                   tokens = t
                 }
               })
-            ]
-          : []
-        ).concat(this.style.postcssPlugins || []),
+            : undefined,
+          this.template.isProduction
+            ? postcssClean(this.style.postcssCleanOptions)
+            : undefined
+        ]
+          .concat(this.style.postcssPlugins)
+          .filter(Boolean),
         preprocessLang: style.lang,
         preprocessOptions:
           (style.lang &&
@@ -129,7 +135,8 @@ export class SFCCompiler {
         scoped: style.scoped,
         moduleName: style.module === true ? '$style' : <any>style.module,
         module: tokens,
-        ...result
+        ...result,
+        code: result.code
       }
     })
 

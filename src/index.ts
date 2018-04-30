@@ -10,20 +10,25 @@ export const createCompiler = ({
   style,
   template
 }: {
-script: ScriptOptions
-style: StyleOptions
-template: TemplateOptions
+  script: ScriptOptions
+  style: StyleOptions
+  template: TemplateOptions
 }) => new SFCCompiler(script, style, template)
 
-export const createDefaultCompiler = () =>
+export const createDefaultCompiler = (options: {
+  script?: ScriptOptions
+  style?: StyleOptions
+  template?: TemplateOptions
+} = {}) =>
   createCompiler({
-    script: {},
-    style: { trim: true },
+    script: { ...options.script },
+    style: { trim: true, ...options.style },
     template: {
       compiler: require('vue-template-compiler'),
       compilerOptions: {},
       isProduction: process.env.NODE_ENV === 'production',
-      optimizeSSR: process.env.VUE_ENV === 'server'
+      optimizeSSR: process.env.VUE_ENV === 'server',
+      ...options.template
     }
   })
 

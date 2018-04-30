@@ -6,7 +6,11 @@
     "type": "git",
     "url": "git+https://github.com/vuejs/vue-component-compiler.git"
   },
-  "keywords": ["vue", "compiler", "sfc"],
+  "keywords": [
+    "vue",
+    "compiler",
+    "sfc"
+  ],
   "author": "Rahul Kadyan",
   "license": "MIT",
   "bugs": {
@@ -22,6 +26,7 @@
   },
   "homepage": "https://github.com/vuejs/vue-component-compiler#readme",
   "devDependencies": {
+    "@types/clean-css": "^3.4.30",
     "@types/jest": "^22.2.3",
     "@types/node": "^9.4.7",
     "babel-plugin-external-helpers": "^6.22.0",
@@ -46,6 +51,7 @@
   },
   "dependencies": {
     "@vue/component-compiler-utils": "^1.2.1",
+    "clean-css": "^4.1.11",
     "hash-sum": "^1.0.2",
     "postcss-modules-sync": "^1.0.0"
   }
