@@ -86,6 +86,7 @@ export class SFCCompiler {
     })
 
     const scopeId =
+      'data-v-' +
       (this.template.isProduction
         ? hash(path.basename(filename) + source)
         : hash(filename + source))
