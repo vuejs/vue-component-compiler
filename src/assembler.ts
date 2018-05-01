@@ -72,7 +72,7 @@ ${styles.map(
 /* script */
 ${script.source.replace(/export default/, 'const __vue_script__ =')}
 /* scoped */
-const __vue_scope_id__ = ${e(hasScopedStyle)} ? ${e(scopeId)} : undefined
+const __vue_scope_id__ = ${e(hasScopedStyle)} ? ${e('data-v-' + scopeId)} : undefined
 /* functional template */
 const __vue_is_functional_template__ = ${e(template.functional)}
 /* component normalizer */
