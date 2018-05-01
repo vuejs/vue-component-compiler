@@ -1,5 +1,5 @@
 {
-  "name": "vue-component-compiler",
+  "name": "@vue/component-compiler",
   "version": "3.0.0",
   "description": "bundler agnostic API for compiling Vue SFC",
   "repository": {
