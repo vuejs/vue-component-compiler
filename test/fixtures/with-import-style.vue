@@ -10,16 +10,4 @@ export default {
 }
 </script>
 
-<style>
-.title {
-  color: red;
-}
-</style>
-
-<documentation lang="md">
-# Component
-
-## Data
-
-- **name** - Name of a person.
-</documentation>
+<style src="./style.css"></style>

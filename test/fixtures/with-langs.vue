@@ -1,5 +1,5 @@
-<template>
-  <h1 id="test" class="title">Hello {{ name }}!</h1>
+<template lang="pug">
+  h1#test.title Hello {{ name }}!
 </template>
 
 <script>
@@ -10,8 +10,10 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+$color: red;
+
 .title {
-  color: red;
+  color: $color;
 }
 </style>

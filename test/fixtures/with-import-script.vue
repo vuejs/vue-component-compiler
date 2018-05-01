@@ -2,13 +2,7 @@
   <h1 id="test" class="title">Hello {{ name }}!</h1>
 </template>
 
-<script>
-export default {
-  data () {
-    return { name: 'John Doe' }
-  }
-}
-</script>
+<script src="./script.js"></script>
 
 <style>
 .title {

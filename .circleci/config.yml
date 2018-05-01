@@ -13,7 +13,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
           name: Install package dependencies
-          command: yarn --no-progress install
+          command: yarn --no-progress install --pure-lockfile
       - save_cache:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:

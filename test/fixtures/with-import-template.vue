@@ -1,6 +1,4 @@
-<template>
-  <h1 id="test" class="title">Hello {{ name }}!</h1>
-</template>
+<template src="./template.html"></template>
 
 <script>
 export default {
