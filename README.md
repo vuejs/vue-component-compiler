@@ -83,7 +83,7 @@ interface TemplateCompileResult {
 
 The blocks from the resulting descriptor should be assembled into JavaScript code:
 
-##### assemble(compiler: SFCCompiler, filename: string, result: DescriptorCompileResult): AssembleResults
+##### assemble(compiler: SFCCompiler, filename: string, result: DescriptorCompileResult, options: AssembleOptions): AssembleResults
 
 ```typescript
 interface AssembleResults {
@@ -92,5 +92,17 @@ interface AssembleResults {
 }
 ```
 
+```typescript
+interface AssembleOptions {
+  normalizer?: string
+  styleInjector?: string
+  styleInjectorSSR?: string
+}
+```
 
-The `assemble` method is an example implementation for how to combine various parts from the descriptor. The current implementation assembles everything inline. 
+
+The `assemble` method is an example implementation for how to combine various parts from the descriptor. You can provide custom implementations for `normalizer`, `styleInjector` and `styleInjectorSSR`:
+
+* Directly in-lined (default)
+* Using a global function (normalizer: 'myComponentNormalizer')
+* Using an import ({ normalizer: '~my-component-normalizer' })

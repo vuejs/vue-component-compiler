@@ -20,12 +20,19 @@ export interface AssembleResults {
   map?: any
 }
 
+export interface AssembleOptions {
+  normalizer?: string
+  styleInjector?: string
+  styleInjectorSSR?: string
+}
+
 export function assemble(
   compiler: SFCCompiler,
   filename: string,
-  result: DescriptorCompileResult
+  result: DescriptorCompileResult,
+  options: AssembleOptions = {}
 ): AssembleResults {
-  return assembleFromSource(compiler, {
+  return assembleFromSource(compiler, options, {
     filename,
     scopeId: result.scopeId,
     script: result.script && { source: result.script.code },
@@ -51,6 +58,7 @@ export function assemble(
 
 export function assembleFromSource(
   compiler: SFCCompiler,
+  options: AssembleOptions,
   { filename, script, template, styles, scopeId }: AssembleSource
 ): AssembleResults {
   script = script || { source: 'export default {}' }
@@ -59,11 +67,13 @@ export function assembleFromSource(
   const hasScopedStyle = styles.some(style => style.scoped === true)
   const hasStyle = styles.length > 0
   const e = (any: any): string => JSON.stringify(any)
-
+  const createImport = (name: string, value: string) => value.startsWith('~')
+    ? `import ${name} from '${value.substr(1)}'`
+    : `const ${name} = ${value}`
   const o = e
 
   // language=JavaScript
-  const createInjector = `function __vue_create_injector__() {
+  const inlineCreateInjector = `function __vue_create_injector__() {
   const head = document.head || document.getElementsByTagName('head')[0]
   const styles = {}
   const isOldIE =
@@ -130,9 +140,12 @@ export function assembleFromSource(
     }
   }
 }`
+  const createInjector = options.styleInjector
+    ? createImport('__vue_create_injector__', options.styleInjector)
+    : inlineCreateInjector
 
   // language=JavaScript
-  const createInjectorSSR = `function __vue_create_injector_ssr__(context) {
+  const inlineCreateInjectorSSR = `function __vue_create_injector_ssr__(context) {
   if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
     context = __VUE_SSR_CONTEXT__
   }
@@ -183,9 +196,12 @@ export function assembleFromSource(
     }
   }
 }`
+  const createInjectorSSR = options.styleInjectorSSR
+    ? createImport('__vue_create_injector_ssr__', options.styleInjectorSSR)
+    : inlineCreateInjectorSSR
 
   // language=JavaScript
-  const normalizeComponent = `function __vue_normalize__(
+  const inlineNormalizeComponent = `function __vue_normalize__(
   template, style, script,
   scope, functional, moduleIdentifier,
   createInjector, createInjectorSSR
@@ -257,6 +273,9 @@ export function assembleFromSource(
 
   return component
 }`
+  const normalizeComponent = options.normalizer
+    ? createImport('__vue_normalize__', options.normalizer)
+    : inlineNormalizeComponent
 
   // language=JavaScript
   const code = `
