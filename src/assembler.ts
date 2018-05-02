@@ -71,6 +71,7 @@ export function assembleFromSource(
     ? `import ${name} from '${value.substr(1)}'`
     : `const ${name} = ${value}`
   const o = e
+  const IDENTIFIER = /^[a-z0-9]+$/i
 
   // language=JavaScript
   const inlineCreateInjector = `function __vue_create_injector__() {
@@ -293,18 +294,19 @@ const __vue_template__ = typeof __vue_render__ !== 'undefined'
 const __vue_inject_styles__ = ${hasStyle} ? function (inject) {
   if (!inject) return
   ${styles.map(
-    (style, index) =>
-      `inject("${scopeId + '_' + index}", ${o({
-        source: style.source,
-        media: style.media,
-        map: compiler.template.isProduction ? undefined : style.map
-      })})` +
+    (style, index) => {
+      const source = IDENTIFIER.test(style.source) ? style.source : e(style.source)
+      const map = !compiler.template.isProduction 
+        ? (typeof style.map === 'string' && IDENTIFIER.test(style.map) ? style.map : o(style.map)) 
+        : undefined
+      const tokens = typeof style.module === 'string' && IDENTIFIER.test(style.module) ? style.module : o(style.module)
+      
+      return `inject("${scopeId + '_' + index}", { source: ${source}, map: ${map}, media: ${e(style.media)} })` +
       '\n' +
       (style.moduleName
-        ? `Object.defineProperty(this, "${style.moduleName}", { value: ${o(
-            style.module || {}
-          )} })` + '\n'
+        ? `Object.defineProperty(this, "${style.moduleName}", { value: ${tokens} })` + '\n'
         : '')
+    }
   )}
 } : undefined
 /* scoped */
