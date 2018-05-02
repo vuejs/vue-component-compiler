@@ -5,7 +5,7 @@ const path = require('path')
 const { createDefaultCompiler, assemble } = require('../..')
 
 const compiler = createDefaultCompiler()
-function compile (filename, source) {
+function compile(filename, source) {
   return assemble(
     compiler,
     filename,
@@ -16,12 +16,14 @@ function compile (filename, source) {
 const isSourceChanged =
   fs.readFileSync(path.resolve(__dirname, '../../dist/compiler.js')) +
   ':' +
-  fs.readFileSync(path.resolve(__dirname, '../../dist/assembler.js'))
-':' +
+  fs.readFileSync(path.resolve(__dirname, '../../dist/assembler.js')) +
+  ':' +
+  fs.readFileSync(path.resolve(__dirname, '../../dist/postcss-clean.js')) +
+  ':' +
   fs.readFileSync(path.resolve(__dirname, '../../package.json'))
 
 module.exports = {
-  process (code, path) {
+  process(code, path) {
     if (path.endsWith('.vue')) {
       code = compile(path, code)
     } else if (path.endsWith('.png')) {
@@ -31,10 +33,10 @@ module.exports = {
       )}"`
     }
     return babel.transform(code, {
-      presets: [['env', { targets: { node: 'current' }}]]
+      presets: [['env', { targets: { node: 'current' } }]]
     }).code
   },
-  getCacheKey (fileData, filename, configString) {
+  getCacheKey(fileData, filename, configString) {
     return crypto
       .createHash('md5')
       .update(

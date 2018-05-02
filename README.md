@@ -106,3 +106,5 @@ The `assemble` method is an example implementation for how to combine various pa
 * Directly in-lined (default)
 * Using a global function (normalizer: 'myComponentNormalizer')
 * Using an import ({ normalizer: '~my-component-normalizer' })
+
+The `assemble` method also accepts global variable name in `source`, `map` and `module` of styles. 

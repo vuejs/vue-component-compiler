@@ -1,4 +1,4 @@
-import postcss = require('postcss')
+import * as postcss from 'postcss'
 import CleanCSS = require('clean-css')
 
 export default postcss.plugin('clean', options => {
