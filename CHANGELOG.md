@@ -1,3 +1,23 @@
+<a name="3.2.0"></a>
+# [3.2.0](https://github.com/vuejs/vue-component-compiler/compare/v3.1.1...v3.2.0) (2018-05-06)
+
+
+### Features
+
+* Skip style injection when style soure is empty ([#65](https://github.com/vuejs/vue-component-compiler/issues/65)) ([5726a24](https://github.com/vuejs/vue-component-compiler/commit/5726a24))
+
+
+
+<a name="3.1.1"></a>
+## [3.1.1](https://github.com/vuejs/vue-component-compiler/compare/v3.1.0...v3.1.1) (2018-05-02)
+
+
+### Features
+
+* Use global variables as style source ([#64](https://github.com/vuejs/vue-component-compiler/issues/64)) ([14c6a3d](https://github.com/vuejs/vue-component-compiler/commit/14c6a3d))
+
+
+
 <a name="3.1.1"></a>
 ## [3.1.1](https://github.com/vuejs/vue-component-compiler/compare/v3.1.0...v3.1.1) (2018-05-02)
 
