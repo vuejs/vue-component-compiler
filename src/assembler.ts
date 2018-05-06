@@ -65,11 +65,12 @@ export function assembleFromSource(
   template = template || { source: '' }
 
   const hasScopedStyle = styles.some(style => style.scoped === true)
-  const hasStyle = styles.length > 0
+  const hasStyle = styles.some(style => Boolean(style.source))
   const e = (any: any): string => JSON.stringify(any)
-  const createImport = (name: string, value: string) => value.startsWith('~')
-    ? `import ${name} from '${value.substr(1)}'`
-    : `const ${name} = ${value}`
+  const createImport = (name: string, value: string) =>
+    value.startsWith('~')
+      ? `import ${name} from '${value.substr(1)}'`
+      : `const ${name} = ${value}`
   const o = e
   const IDENTIFIER = /^[a-z0-9]+$/i
 
@@ -293,21 +294,35 @@ const __vue_template__ = typeof __vue_render__ !== 'undefined'
 /* style */
 const __vue_inject_styles__ = ${hasStyle} ? function (inject) {
   if (!inject) return
-  ${styles.map(
-    (style, index) => {
-      const source = IDENTIFIER.test(style.source) ? style.source : e(style.source)
-      const map = !compiler.template.isProduction 
-        ? (typeof style.map === 'string' && IDENTIFIER.test(style.map) ? style.map : o(style.map)) 
-        : undefined
-      const tokens = typeof style.module === 'string' && IDENTIFIER.test(style.module) ? style.module : o(style.module)
-      
-      return `inject("${scopeId + '_' + index}", { source: ${source}, map: ${map}, media: ${e(style.media)} })` +
-      '\n' +
+  ${styles.map((style, index) => {
+    const source = IDENTIFIER.test(style.source)
+      ? style.source
+      : e(style.source)
+    const map = !compiler.template.isProduction
+      ? typeof style.map === 'string' && IDENTIFIER.test(style.map)
+        ? style.map
+        : o(style.map)
+      : undefined
+    const tokens =
+      typeof style.module === 'string' && IDENTIFIER.test(style.module)
+        ? style.module
+        : o(style.module)
+
+    return (
+      (source
+        ? `inject("${scopeId +
+            '_' +
+            index}", { source: ${source}, map: ${map}, media: ${e(
+            style.media
+          )} })\n`
+        : '') +
       (style.moduleName
-        ? `Object.defineProperty(this, "${style.moduleName}", { value: ${tokens} })` + '\n'
+        ? `Object.defineProperty(this, "${
+            style.moduleName
+          }", { value: ${tokens} })` + '\n'
         : '')
-    }
-  )}
+    )
+  })}
 } : undefined
 /* scoped */
 const __vue_scope_id__ = ${e(hasScopedStyle)} ? "${scopeId}" : undefined
