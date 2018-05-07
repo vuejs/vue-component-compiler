@@ -94,7 +94,9 @@ export class SFCCompiler {
     const template =
       descriptor.template && this.compileTemplate(filename, descriptor.template)
 
-    const styles = descriptor.styles.map(style => this.compileStyle(filename, scopeId, style))
+    const styles = descriptor.styles.map(style =>
+      this.compileStyle(filename, scopeId, style)
+    )
 
     const { script: rawScript, customBlocks } = descriptor
     const script = rawScript && {
@@ -113,7 +115,10 @@ export class SFCCompiler {
     }
   }
 
-  private compileTemplate(filename: string, template: SFCBlock) {
+  compileTemplate(
+    filename: string,
+    template: SFCBlock
+  ): TemplateCompileResult & { functional: boolean } {
     const { preprocessOptions, ...options } = this.template
     const functional = 'functional' in template.attrs
 
@@ -136,18 +141,23 @@ export class SFCCompiler {
     }
   }
 
-  private compileStyle(filename: string, scopeId: string, style: SFCBlock) {
+  compileStyle(
+    filename: string,
+    scopeId: string,
+    style: SFCBlock
+  ): StyleCompileResult {
     let tokens = undefined
-    const needsCSSModules = style.module === true || typeof style.module === 'string'
+    const needsCSSModules =
+      style.module === true || typeof style.module === 'string'
     const postcssPlugins = [
       needsCSSModules
         ? postcssModules({
-          generateScopedName: '[path][local]-[hash:base64:4]',
-          ...this.style.postcssModulesOptions,
-          getJSON: (t: any) => {
-            tokens = t
-          }
-        })
+            generateScopedName: '[path][local]-[hash:base64:4]',
+            ...this.style.postcssModulesOptions,
+            getJSON: (t: any) => {
+              tokens = t
+            }
+          })
         : undefined,
       this.template.isProduction
         ? postcssClean(this.style.postcssCleanOptions)
@@ -165,10 +175,10 @@ export class SFCCompiler {
       postcssOptions: this.style.postcssOptions,
       preprocessLang: style.lang,
       preprocessOptions:
-      (style.lang &&
-        this.style.preprocessOptions &&
-        this.style.preprocessOptions[style.lang]) ||
-      {},
+        (style.lang &&
+          this.style.preprocessOptions &&
+          this.style.preprocessOptions[style.lang]) ||
+        {},
       trim: this.style.trim
     })
 
