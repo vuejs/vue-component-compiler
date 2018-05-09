@@ -65,7 +65,7 @@ export function assembleFromSource(
   template = template || { source: '' }
 
   const hasScopedStyle = styles.some(style => style.scoped === true)
-  const hasStyle = styles.some(style => Boolean(style.source))
+  const hasStyle = styles.some(style => (style.source || style.module))
   const e = (any: any): string => JSON.stringify(any)
   const createImport = (name: string, value: string) =>
     value.startsWith('~')
