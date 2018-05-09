@@ -1,3 +1,23 @@
+<a name="3.3.1"></a>
+## [3.3.1](https://github.com/vuejs/vue-component-compiler/compare/v3.3.0...v3.3.1) (2018-05-09)
+
+
+### Bug Fixes
+
+* Inject CSS module tokens even when css is not present ([#67](https://github.com/vuejs/vue-component-compiler/issues/67)) ([05c5210](https://github.com/vuejs/vue-component-compiler/commit/05c5210))
+
+
+
+<a name="3.3.0"></a>
+# [3.3.0](https://github.com/vuejs/vue-component-compiler/compare/v3.2.0...v3.3.0) (2018-05-07)
+
+
+### Features
+
+* Change visibilty of compileStyle and compileTemplate methods to public ([#66](https://github.com/vuejs/vue-component-compiler/issues/66)) ([c505f94](https://github.com/vuejs/vue-component-compiler/commit/c505f94))
+
+
+
 <a name="3.3.0"></a>
 # [3.3.0](https://github.com/vuejs/vue-component-compiler/compare/v3.2.0...v3.3.0) (2018-05-07)
 
