@@ -1,3 +1,17 @@
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+<a name="3.3.2"></a>
+## [3.3.2](https://github.com/vuejs/vue-component-compiler/compare/v3.3.1...v3.3.2) (2018-05-13)
+
+
+### Bug Fixes
+
+* Prevent duplicate style injection ([#68](https://github.com/vuejs/vue-component-compiler/issues/68)) ([58247ce](https://github.com/vuejs/vue-component-compiler/commit/58247ce))
+
+
+
 <a name="3.3.1"></a>
 ## [3.3.1](https://github.com/vuejs/vue-component-compiler/compare/v3.3.0...v3.3.1) (2018-05-09)
 
@@ -117,6 +131,3 @@
 ### Features
 
 * Use custom implementation of normalizer if provided ([37f6cd8](https://github.com/vuejs/vue-component-compiler/commit/37f6cd8))
-
-
-
