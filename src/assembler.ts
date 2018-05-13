@@ -77,7 +77,7 @@ export function assembleFromSource(
   // language=JavaScript
   const inlineCreateInjector = `function __vue_create_injector__() {
   const head = document.head || document.getElementsByTagName('head')[0]
-  const styles = {}
+  const styles = __vue_create_injector__.styles || (__vue_create_injector__.styles = {})
   const isOldIE =
     typeof navigator !== 'undefined' &&
     /msie [6-9]\\\\b/.test(navigator.userAgent.toLowerCase())
