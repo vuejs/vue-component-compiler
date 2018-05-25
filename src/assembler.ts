@@ -208,7 +208,7 @@ export function assembleFromSource(
   scope, functional, moduleIdentifier,
   createInjector, createInjectorSSR
 ) {
-  const component = script || {}
+  const component = (typeof script === 'function' ? script.options : script) || {}
 
   if (${e(!compiler.template.isProduction)}) {
     component.__file = ${e(filename)}
