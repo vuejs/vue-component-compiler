@@ -64,15 +64,18 @@ export class SFCCompiler {
   script: ScriptOptions
   style: StyleOptions
   template: TemplateOptions
+  resolve: RequireResolve
 
   constructor(
     script: ScriptOptions,
     style: StyleOptions,
-    template: TemplateOptions
+    template: TemplateOptions,
+    resolve: RequireResolve = require.resolve
   ) {
     this.template = template
     this.style = style
     this.script = script
+    this.resolve = resolve
   }
 
   compileToDescriptor(
@@ -193,8 +196,20 @@ export class SFCCompiler {
   }
 
   private read(filename: string, context: string): string {
-    return fs
-      .readFileSync(path.resolve(path.dirname(context), filename))
-      .toString()
+    try {
+      return fs
+        .readFileSync(
+          filename.startsWith('.')
+            ? path.resolve(path.dirname(context), filename)
+            : this.resolve(filename, { paths: [path.dirname(context)] })
+        )
+        .toString()
+    } catch (e) {
+      if (/cannot find module/i.test(e.message)) {
+        throw Error(`Cannot find '${filename}' in '${context}'`)
+      }
+
+      throw e
+    }
   }
 }
