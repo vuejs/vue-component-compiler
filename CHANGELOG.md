@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.3.3"></a>
+## [3.3.3](https://github.com/vuejs/vue-component-compiler/compare/v3.3.2...v3.3.3) (2018-05-25)
+
+
+### Bug Fixes
+
+* Resolve src values on style blocks with require.resolve ([#70](https://github.com/vuejs/vue-component-compiler/issues/70)) ([0e8e005](https://github.com/vuejs/vue-component-compiler/commit/0e8e005))
+* Use options from `Vue.extend` constructor export from script block ([#69](https://github.com/vuejs/vue-component-compiler/issues/69)) ([4280da0](https://github.com/vuejs/vue-component-compiler/commit/4280da0))
+
+
+
 <a name="3.3.2"></a>
 ## [3.3.2](https://github.com/vuejs/vue-component-compiler/compare/v3.3.1...v3.3.2) (2018-05-13)
 
