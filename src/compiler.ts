@@ -17,7 +17,6 @@ import postcssClean from './postcss-clean'
 import hash = require('hash-sum')
 import * as fs from 'fs'
 import * as path from 'path'
-import os from'os'
 
 export interface TemplateOptions {
   compiler: VueTemplateCompiler
@@ -176,7 +175,7 @@ export class SFCCompiler {
       {}
     const source = style.src ? this.read(style.src, filename) : style.content
     const result = compileStyle(<any>{
-      source: preprocessOptions.data ? `${preprocessOptions.data} ${os.EOL} ${source}` : source,
+      source: preprocessOptions.data ? `${preprocessOptions.data}\n${source}` : source,
       filename,
       id: scopeId,
       map: style.map,
