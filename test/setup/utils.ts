@@ -24,7 +24,9 @@ function inline(filename, code) {
       if (id === filename) return filename
     },
     load(id) {
-      if (id === filename) return code
+      if (id === filename) {
+        return code
+      }
     }
   }
 }
@@ -55,7 +57,7 @@ function compile(filename, source) {
     if (style.errors.length) console.error(style.errors)
   })
 
-  return assemble(compiler, filename, result).code
+  return assemble(compiler, filename, result)
 }
 
 const babelit = babel({
