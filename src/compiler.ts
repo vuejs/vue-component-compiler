@@ -168,8 +168,14 @@ export class SFCCompiler {
     ]
       .concat(this.style.postcssPlugins)
       .filter(Boolean)
+    const preprocessOptions =
+      (style.lang &&
+        this.style.preprocessOptions &&
+        this.style.preprocessOptions[style.lang]) ||
+      {}
+    const source = style.src ? this.read(style.src, filename) : style.content
     const result = compileStyle(<any>{
-      source: style.src ? this.read(style.src, filename) : style.content,
+      source: preprocessOptions.data ? `${preprocessOptions.data}\n${source}` : source,
       filename,
       id: scopeId,
       map: style.map,
@@ -177,11 +183,7 @@ export class SFCCompiler {
       postcssPlugins,
       postcssOptions: this.style.postcssOptions,
       preprocessLang: style.lang,
-      preprocessOptions:
-        (style.lang &&
-          this.style.preprocessOptions &&
-          this.style.preprocessOptions[style.lang]) ||
-        {},
+      preprocessOptions,
       trim: this.style.trim
     })
 
