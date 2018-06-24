@@ -149,7 +149,8 @@ async function build(filename) {
 
 const vueSource = readFileSync(
   resolve(__dirname, '../../node_modules/vue/dist/vue.min.js')
-)
+).toString()
+const escape = (any: string) => any.replace(/<\//g, '&lt;\/')
 async function open(name, browser, code, id = '#test') {
   const page = await browser.newPage()
 
@@ -161,8 +162,12 @@ async function open(name, browser, code, id = '#test') {
     </head>
     <body>
       <div id="app"></div>
-      <script>${vueSource}</script>
-      <script>${await code}</script>
+      <script>
+      ${escape(vueSource)}
+      </script>
+      <script>
+      ${escape(await code)}
+      </script>
     </body>
   </html>`
 

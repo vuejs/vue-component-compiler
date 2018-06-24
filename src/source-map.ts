@@ -47,8 +47,8 @@ export function merge(
   const consumers = [oldMapConsumer, newMapConsumer]
   consumers.forEach((consumer, index) => {
     maps[index].sources.forEach(sourceFile => {
-      const sourceContent = consumer.sourceContentFor(sourceFile)
-      if (sourceContent != null) {
+      const sourceContent = consumer.sourceContentFor(sourceFile, true)
+      if (sourceContent !== null) {
         mergedMapGenerator.setSourceContent(sourceFile, sourceContent)
       }
     })
