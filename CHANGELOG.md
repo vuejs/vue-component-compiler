@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.0"></a>
+# [3.4.0](https://github.com/vuejs/vue-component-compiler/compare/v3.3.3...v3.4.0) (2018-06-24)
+
+
+### Features
+
+* preprocessor `data` option to prepend shared styles ([#73](https://github.com/vuejs/vue-component-compiler/issues/73)) ([5a81749](https://github.com/vuejs/vue-component-compiler/commit/5a81749))
+* Script source map support in assemble ([#74](https://github.com/vuejs/vue-component-compiler/issues/74)) ([13cd119](https://github.com/vuejs/vue-component-compiler/commit/13cd119))
+
+
+
 <a name="3.3.3"></a>
 ## [3.3.3](https://github.com/vuejs/vue-component-compiler/compare/v3.3.2...v3.3.3) (2018-05-25)
 
