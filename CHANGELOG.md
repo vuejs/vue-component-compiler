@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.1"></a>
+## [3.4.1](https://github.com/vuejs/vue-component-compiler/compare/v3.4.0...v3.4.1) (2018-06-27)
+
+
+### Bug Fixes
+
+* Add scope ID only if scoped style is present ([1a42be3](https://github.com/vuejs/vue-component-compiler/commit/1a42be3)), closes [#75](https://github.com/vuejs/vue-component-compiler/issues/75)
+
+
+
 <a name="3.4.0"></a>
 # [3.4.0](https://github.com/vuejs/vue-component-compiler/compare/v3.3.3...v3.4.0) (2018-06-24)
 
