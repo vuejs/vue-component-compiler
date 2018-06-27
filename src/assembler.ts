@@ -335,7 +335,7 @@ export function assembleFromSource(
     })}
   } : undefined
   /* scoped */
-  const __vue_scope_id__ = ${e(hasScopedStyle) ? e(scopeId) : 'undefined'}
+  const __vue_scope_id__ = ${hasScopedStyle ? e(scopeId) : 'undefined'}
   /* module identifier */
   const __vue_module_identifier__ = ${
     compiler.template.optimizeSSR ? e(scopeId) : 'undefined'
