@@ -18,6 +18,8 @@ import hash = require('hash-sum')
 import * as fs from 'fs'
 import * as path from 'path'
 
+const templateCompiler = require('vue-template-compiler')
+
 export interface TemplateOptions {
   compiler: VueTemplateCompiler
   compilerOptions: VueTemplateCompilerOptions
@@ -85,7 +87,8 @@ export class SFCCompiler {
     const descriptor = parse({
       source,
       filename,
-      needMap: true
+      needMap: true,
+      compiler: templateCompiler
     })
 
     const scopeId =
