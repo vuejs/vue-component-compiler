@@ -1,6 +1,7 @@
 import { SourceMapGenerator } from 'source-map'
 import { SFCCompiler, DescriptorCompileResult } from './compiler'
 import { merge } from './source-map'
+import * as path from 'path'
 
 // const merge = require('merge-source-map')
 
@@ -221,9 +222,8 @@ export function assembleFromSource(
   ) {
     const component = (typeof script === 'function' ? script.options : script) || {}
 
-    if (${e(!compiler.template.isProduction)}) {
-      component.__file = ${e(filename)}
-    }
+    // For security concerns, we use only base name in production mode.
+    component.__file = ${compiler.template.isProduction ? e(path.basename(filename)) : e(filename)}
 
     if (!component.render) {
       component.render = template.render
@@ -302,7 +302,7 @@ export function assembleFromSource(
       .replace('var staticRenderFns =', 'var __vue_staticRenderFns__ =')
       .replace('render._withStripped =', '__vue_render__._withStripped =')}
   /* style */
-  const __vue_inject_styles__ = ${hasStyle} ? function (inject) {
+  const __vue_inject_styles__ = ${hasStyle ? `function (inject) {
     if (!inject) return
     ${styles.map((style, index) => {
       const source = IDENTIFIER.test(style.source)
@@ -333,7 +333,7 @@ export function assembleFromSource(
           : '')
       )
     })}
-  } : undefined
+  }` : 'undefined'}
   /* scoped */
   const __vue_scope_id__ = ${hasScopedStyle ? e(scopeId) : 'undefined'}
   /* module identifier */
