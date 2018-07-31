@@ -345,9 +345,9 @@ export function assembleFromSource(
   /* component normalizer */
   ${normalizeComponent}
   /* style inject */
-  ${!compiler.template.optimizeSSR ? createInjector : ''}
+  ${hasStyle && !compiler.template.optimizeSSR ? createInjector : ''}
   /* style inject SSR */
-  ${compiler.template.optimizeSSR ? createInjectorSSR : ''}
+  ${hasStyle && compiler.template.optimizeSSR ? createInjectorSSR : ''}
 
   `
 
