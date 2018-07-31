@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.3"></a>
+## [3.4.3](https://github.com/vuejs/vue-component-compiler/compare/v3.4.2...v3.4.3) (2018-07-31)
+
+
+### Bug Fixes
+
+* Use basename for __file in production mode ([541a824](https://github.com/vuejs/vue-component-compiler/commit/541a824))
+
+
+
 <a name="3.4.2"></a>
 ## [3.4.2](https://github.com/vuejs/vue-component-compiler/compare/v3.4.1...v3.4.2) (2018-07-13)
 
