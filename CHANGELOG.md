@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.5.0"></a>
+# [3.5.0](https://github.com/vuejs/vue-component-compiler/compare/v3.4.5...v3.5.0) (2018-08-28)
+
+
+### Features
+
+* Allow disabling clean CSS ([9d43b80](https://github.com/vuejs/vue-component-compiler/commit/9d43b80))
+
+
+
 <a name="3.4.5"></a>
 ## [3.4.5](https://github.com/vuejs/vue-component-compiler/compare/v3.4.4...v3.4.5) (2018-08-28)
 
