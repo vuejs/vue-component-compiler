@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="3.4.5"></a>
+## [3.4.5](https://github.com/vuejs/vue-component-compiler/compare/v3.4.4...v3.4.5) (2018-08-28)
+
+
+### Bug Fixes
+
+* Do not generate style injector code if component has no style ([78a2da3](https://github.com/vuejs/vue-component-compiler/commit/78a2da3))
+
+
+
 <a name="3.4.4"></a>
 ## [3.4.4](https://github.com/vuejs/vue-component-compiler/compare/v3.4.3...v3.4.4) (2018-07-31)
 
