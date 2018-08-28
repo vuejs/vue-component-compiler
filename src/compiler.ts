@@ -155,6 +155,8 @@ export class SFCCompiler {
     let tokens = undefined
     const needsCSSModules =
       style.module === true || typeof style.module === 'string'
+    const needsCleanCSS =
+      this.template.isProduction && !(this.style.postcssCleanOptions && this.style.postcssCleanOptions.disabled)
     const postcssPlugins = [
       needsCSSModules
         ? postcssModules({
@@ -165,7 +167,7 @@ export class SFCCompiler {
             }
           })
         : undefined,
-      this.template.isProduction
+      needsCleanCSS
         ? postcssClean(this.style.postcssCleanOptions)
         : undefined
     ]
