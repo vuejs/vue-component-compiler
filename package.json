@@ -23,11 +23,11 @@
   ],
   "scripts": {
     "build": "tsc",
-    "prepare": "yarn build",
+    "prepare": "rm -rf dist && npm run build",
+    "pretest": "npm run build",
     "test": "jest",
-    "pretest": "yarn build",
-    "changelog": "conventional-changelog -p angular -r 2 -i CHANGELOG.md -s",
-    "version": "npm run changelog && git add CHANGELOG.md"
+    "prerelease": "npm run test",
+    "release": "standard-version -a"
   },
   "homepage": "https://github.com/vuejs/vue-component-compiler#readme",
   "devDependencies": {

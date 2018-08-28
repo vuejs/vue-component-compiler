@@ -2,9 +2,11 @@ import {
   parse,
   compileTemplate,
   compileStyle,
+  compileStyleAsync,
   SFCBlock,
   StyleCompileResults,
-  TemplateCompileResult
+  TemplateCompileResult,
+  StyleCompileOptions
 } from '@vue/component-compiler-utils'
 import {
   VueTemplateCompiler,
@@ -14,10 +16,10 @@ import { AssetURLOptions } from '@vue/component-compiler-utils/dist/templateComp
 
 import postcssModules from 'postcss-modules-sync'
 import postcssClean from './postcss-clean'
-import hash = require('hash-sum')
 import * as fs from 'fs'
 import * as path from 'path'
 
+const hash = require('hash-sum')
 const templateCompiler = require('vue-template-compiler')
 
 export interface TemplateOptions {
@@ -121,6 +123,49 @@ export class SFCCompiler {
     }
   }
 
+  async compileToDescriptorAsync(
+    filename: string,
+    source: string
+  ): Promise<DescriptorCompileResult> {
+    const descriptor = parse({
+      source,
+      filename,
+      needMap: true,
+      compiler: templateCompiler
+    })
+
+    const scopeId =
+      'data-v-' +
+      (this.template.isProduction
+        ? hash(path.basename(filename) + source)
+        : hash(filename + source))
+
+    const template =
+      descriptor.template && this.compileTemplate(filename, descriptor.template)
+
+    const styles = await Promise.all(
+      descriptor.styles.map(style =>
+        this.compileStyleAsync(filename, scopeId, style)
+      )
+    )
+
+    const { script: rawScript, customBlocks } = descriptor
+    const script = rawScript && {
+      code: rawScript.src
+        ? this.read(rawScript.src, filename)
+        : rawScript.content,
+      map: rawScript.map
+    }
+
+    return {
+      scopeId,
+      template,
+      styles,
+      script,
+      customBlocks
+    }
+  }
+
   compileTemplate(
     filename: string,
     template: SFCBlock
@@ -152,7 +197,28 @@ export class SFCCompiler {
     scopeId: string,
     style: SFCBlock
   ): StyleCompileResult {
-    let tokens = undefined
+    const { options, prepare } = this.doCompileStyle(filename, scopeId, style)
+
+    return prepare(compileStyle(options))
+  }
+
+  async compileStyleAsync(
+    filename: string,
+    scopeId: string,
+    style: SFCBlock
+  ): Promise<StyleCompileResult> {
+    const { options, prepare } = this.doCompileStyle(filename, scopeId, style)
+
+    return prepare(await compileStyleAsync(options))
+  }
+
+  private doCompileStyle(
+    filename: string,
+    scopeId: string,
+    style: SFCBlock
+  ): { options: StyleCompileOptions, prepare: (result: StyleCompileResults) => StyleCompileResult } {
+    let tokens: any = undefined
+
     const needsCSSModules =
       style.module === true || typeof style.module === 'string'
     const needsCleanCSS =
@@ -179,26 +245,28 @@ export class SFCCompiler {
         this.style.preprocessOptions[style.lang]) ||
       {}
     const source = style.src ? this.read(style.src, filename) : style.content
-    const result = compileStyle(<any>{
-      source: preprocessOptions.data ? `${preprocessOptions.data}\n${source}` : source,
-      filename,
-      id: scopeId,
-      map: style.map,
-      scoped: style.scoped || false,
-      postcssPlugins,
-      postcssOptions: this.style.postcssOptions,
-      preprocessLang: style.lang,
-      preprocessOptions,
-      trim: this.style.trim
-    })
-
     return {
-      media: style.attrs.media,
-      scoped: style.scoped,
-      moduleName: style.module === true ? '$style' : <any>style.module,
-      module: tokens,
-      ...result,
-      code: result.code
+      options: {
+        source: preprocessOptions.data ? `${preprocessOptions.data}\n${source}` : source,
+        filename,
+        id: scopeId,
+        map: style.map,
+        scoped: style.scoped || false,
+        postcssPlugins,
+        postcssOptions: this.style.postcssOptions,
+        preprocessLang: style.lang,
+        preprocessOptions,
+        trim: this.style.trim
+      },
+
+      prepare: result => ({
+        media: style.attrs.media,
+        scoped: style.scoped,
+        moduleName: style.module === true ? '$style' : <any>style.module,
+        module: tokens,
+        ...result,
+        code: result.code
+      })
     }
   }
 
