@@ -6,7 +6,7 @@ export default postcss.plugin('clean', options => {
 
   return (css: any, res: any) => {
     const output = clean.minify(css.toString())
-
-    res.root = postcss.parse(output.styles)
+    const from = css.source && css.source.input && css.source.input.file
+    res.root = postcss.parse(output.styles, {from})
   }
 })
