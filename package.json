@@ -47,7 +47,7 @@
     "rollup-plugin-image": "^1.0.2",
     "rollup-plugin-node-resolve": "^3.3.0",
     "ts-jest": "^22.4.2",
-    "typescript": "^2.7.2",
+    "typescript": "^3.2.4",
     "typescript-eslint-parser": "^15.0.0",
     "vue": "^2.5.16",
     "vue-template-compiler": "^2.5.16"
@@ -57,7 +57,7 @@
     "vue-template-compiler": "*"
   },
   "dependencies": {
-    "@vue/component-compiler-utils": "^2.1.0",
+    "@vue/component-compiler-utils": "^2.5.0",
     "clean-css": "^4.1.11",
     "hash-sum": "^1.0.2",
     "postcss-modules-sync": "^1.0.0",
