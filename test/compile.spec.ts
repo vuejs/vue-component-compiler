@@ -41,7 +41,7 @@ it('should compile to descriptor', () => {
   const compiler = createDefaultCompiler()
   const result = compiler.compileToDescriptor('foo.vue', source)
 
-  expect(result).toMatchSnapshot()
+  expect(removeRawResult(result)).toMatchSnapshot()
 })
 
 it('should compile to descriptor (async)', async () => {
@@ -49,14 +49,14 @@ it('should compile to descriptor (async)', async () => {
   const expected = compiler.compileToDescriptor('foo.vue', source)
   const result = await compiler.compileToDescriptorAsync('foo.vue', source)
 
-  function removeRawResult(result: DescriptorCompileResult): DescriptorCompileResult {
-    result.styles.map(style => {
-      delete style.rawResult
-    })
-
-    return result
-  }
-
-  expect(result).toMatchSnapshot()
+  expect(removeRawResult(result)).toMatchSnapshot()
   expect(removeRawResult(result)).toEqual(removeRawResult(expected))
 })
+
+function removeRawResult(result: DescriptorCompileResult): DescriptorCompileResult {
+  result.styles.map(style => {
+    delete style.rawResult
+  })
+
+  return result
+}

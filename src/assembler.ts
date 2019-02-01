@@ -74,7 +74,7 @@ export function assembleFromSource(
   script = script || { source: 'export default {}' }
   template = template || { source: '' }
   let map = undefined
-  const mapGenerator = new SourceMapGenerator({ file: filename })
+  const mapGenerator = new SourceMapGenerator({ file: filename.replace(/\\/g, '/') })
 
   const hasScopedStyle = styles.some(style => style.scoped === true)
   const hasStyle = styles.some(style => style.source || style.module)

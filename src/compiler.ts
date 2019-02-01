@@ -99,20 +99,23 @@ export class SFCCompiler {
         ? hash(path.basename(filename) + source)
         : hash(filename + source))
 
-    const template =
-      descriptor.template && this.compileTemplate(filename, descriptor.template)
+    const template = descriptor.template
+      ? this.compileTemplate(filename, descriptor.template)
+      : undefined
 
     const styles = descriptor.styles.map(style =>
       this.compileStyle(filename, scopeId, style)
     )
 
     const { script: rawScript, customBlocks } = descriptor
-    const script = rawScript && {
-      code: rawScript.src
-        ? this.read(rawScript.src, filename)
-        : rawScript.content,
-      map: rawScript.map
-    }
+    const script = rawScript
+      ? {
+          code: rawScript.src
+            ? this.read(rawScript.src, filename)
+            : rawScript.content,
+          map: rawScript.map
+        }
+      : undefined
 
     return {
       scopeId,
@@ -140,8 +143,9 @@ export class SFCCompiler {
         ? hash(path.basename(filename) + source)
         : hash(filename + source))
 
-    const template =
-      descriptor.template && this.compileTemplate(filename, descriptor.template)
+    const template = descriptor.template
+      ? this.compileTemplate(filename, descriptor.template)
+      : undefined
 
     const styles = await Promise.all(
       descriptor.styles.map(style =>
@@ -150,12 +154,14 @@ export class SFCCompiler {
     )
 
     const { script: rawScript, customBlocks } = descriptor
-    const script = rawScript && {
-      code: rawScript.src
-        ? this.read(rawScript.src, filename)
-        : rawScript.content,
-      map: rawScript.map
-    }
+    const script = rawScript
+      ? {
+          code: rawScript.src
+            ? this.read(rawScript.src, filename)
+            : rawScript.content,
+          map: rawScript.map
+        }
+      : undefined
 
     return {
       scopeId,
@@ -260,7 +266,7 @@ export class SFCCompiler {
       },
 
       prepare: result => ({
-        media: style.attrs.media,
+        media: typeof style.attrs.media === 'string' ? style.attrs.media : undefined,
         scoped: style.scoped,
         moduleName: style.module === true ? '$style' : <any>style.module,
         module: tokens,
