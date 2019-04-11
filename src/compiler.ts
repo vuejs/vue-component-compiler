@@ -229,22 +229,24 @@ export class SFCCompiler {
       style.module === true || typeof style.module === 'string'
     const needsCleanCSS =
       this.template.isProduction && !(this.style.postcssCleanOptions && this.style.postcssCleanOptions.disabled)
-    const postcssPlugins = [
-      needsCSSModules
-        ? postcssModules({
-            generateScopedName: '[path][local]-[hash:base64:4]',
-            ...this.style.postcssModulesOptions,
-            getJSON: (t: any) => {
-              tokens = t
-            }
-          })
-        : undefined,
-      needsCleanCSS
-        ? postcssClean(this.style.postcssCleanOptions)
-        : undefined
-    ]
-      .concat(this.style.postcssPlugins)
+    const postcssPlugins = (this.style.postcssPlugins || [])
+      .slice()
+      .concat([
+        needsCleanCSS
+          ? postcssClean(this.style.postcssCleanOptions)
+          : undefined,
+        needsCSSModules
+          ? postcssModules({
+              generateScopedName: '[path][local]-[hash:base64:4]',
+              ...this.style.postcssModulesOptions,
+              getJSON: (t: any) => {
+                tokens = t
+              }
+            })
+          : undefined,
+      ])
       .filter(Boolean)
+    
     const preprocessOptions =
       (style.lang &&
         this.style.preprocessOptions &&
