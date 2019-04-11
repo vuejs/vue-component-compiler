@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/vuejs/vue-component-compiler/compare/v3.4.5...v4.0.0) (2019-04-11)
+
+
+### Bug Fixes
+
+* **#84:** Move postcss-modules plugins to last ([#86](https://github.com/vuejs/vue-component-compiler/issues/86)) ([d4ae5be](https://github.com/vuejs/vue-component-compiler/commit/d4ae5be)), closes [#84](https://github.com/vuejs/vue-component-compiler/issues/84)
+* normalize source map file path on windows ([#83](https://github.com/vuejs/vue-component-compiler/issues/83)) ([c4bcd40](https://github.com/vuejs/vue-component-compiler/commit/c4bcd40)), closes [vuejs/component-compiler-utils#51](https://github.com/vuejs/component-compiler-utils/issues/51)
+
+
+### Chores
+
+* Upgrade [@vue](https://github.com/vue)/component-compiler-utils ([12f4878](https://github.com/vuejs/vue-component-compiler/commit/12f4878))
+
+
+### Features
+
+* Add compileToDescriptorAsync and compileStyleAsync methods ([ccf7d84](https://github.com/vuejs/vue-component-compiler/commit/ccf7d84))
+* Allow disabling clean CSS ([9d43b80](https://github.com/vuejs/vue-component-compiler/commit/9d43b80))
+
+
+### BREAKING CHANGES
+
+* Update to @vue/component-compiler-utils@3.0.0 which
+uses `sass` instead of `node-sass`
+
+
+
 <a name="3.6.0"></a>
 # [3.6.0](https://github.com/vuejs/vue-component-compiler/compare/v3.5.0...v3.6.0) (2018-08-28)
 
