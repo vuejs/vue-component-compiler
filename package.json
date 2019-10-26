@@ -1,6 +1,6 @@
 {
   "name": "@vue/component-compiler",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "bundler agnostic API for compiling Vue SFC",
   "repository": {
     "type": "git",

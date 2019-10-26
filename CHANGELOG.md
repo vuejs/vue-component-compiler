@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.1.0"></a>
+# [4.1.0](https://github.com/vuejs/vue-component-compiler/compare/v4.0.0...v4.1.0) (2019-10-26)
+
+
+### Features
+
+* inject styles to shadow DOM ([#89](https://github.com/vuejs/vue-component-compiler/issues/89)) ([714f08d](https://github.com/vuejs/vue-component-compiler/commit/714f08d))
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/vuejs/vue-component-compiler/compare/v3.4.5...v4.0.0) (2019-04-11)
 
