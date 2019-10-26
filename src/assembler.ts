@@ -26,9 +26,11 @@ export interface AssembleResults {
 }
 
 export interface AssembleOptions {
+  isWebComponent?: boolean
   normalizer?: string
   styleInjector?: string
   styleInjectorSSR?: string
+  styleInjectorShadow?: string
 }
 
 export function assemble(
@@ -214,11 +216,52 @@ export function assembleFromSource(
     ? createImport('__vue_create_injector_ssr__', options.styleInjectorSSR)
     : inlineCreateInjectorSSR
 
+  const inlineCreateInjectorShadow = `function __vue_create_injector_shadow__(__, shadowRoot) {
+    function createStyleElement(shadowRoot) {
+      var styleElement = document.createElement('style')
+      styleElement.type = 'text/css'
+      shadowRoot.appendChild(styleElement)
+    
+      return styleElement
+    }    
+
+    return function addStyle(id, css) {
+      const styleElement = createStyleElement(shadowRoot)
+      if (css.media) styleElement.setAttribute('media', css.media)
+      
+      let code = css.source
+
+      if (${e(compiler.template.isProduction)} && css.map) {
+        // https://developer.chrome.com/devtools/docs/javascript-debugging
+        // this makes source maps inside style tags work properly in Chrome
+        code += '\\n/*# sourceURL=' + css.map.sources[0] + ' */'
+        // http://stackoverflow.com/a/26603875
+        code +=
+          '\\n/*# sourceMappingURL=data:application/json;base64,' +
+          btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) +
+          ' */'
+      }
+      
+      if ('styleSheet' in styleElement) {
+        styleElement.styleSheet.cssText = code
+      } else {
+        while (styleElement.firstChild) {
+          styleElement.removeChild(styleElement.firstChild)
+        }
+        styleElement.appendChild(document.createTextNode(code))
+      }
+    }
+  }`
+
+  const createInjectorShadow = options.styleInjectorShadow
+    ? createImport('__vue_create_injector_shadow__', options.styleInjectorShadow)
+    : inlineCreateInjectorShadow
+
   // language=JavaScript
   const inlineNormalizeComponent = `function __vue_normalize__(
     template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
+    scope, functional, moduleIdentifier, shadowMode,
+    createInjector, createInjectorSSR, createInjectorShadow
   ) {
     const component = (typeof script === 'function' ? script.options : script) || {}
 
@@ -263,9 +306,13 @@ export function assembleFromSource(
         component._ssrRegister = hook
       }
       else if (style) {
-        hook = function(context) {
-          style.call(this, createInjector(context))
-        }
+        hook = shadowMode 
+          ? function(context) {
+              style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot))
+            }
+          : function(context) {
+              style.call(this, createInjector(context))
+            }
       }
 
       if (hook !== undefined) {
@@ -345,9 +392,11 @@ export function assembleFromSource(
   /* component normalizer */
   ${normalizeComponent}
   /* style inject */
-  ${hasStyle && !compiler.template.optimizeSSR ? createInjector : ''}
+  ${hasStyle && !compiler.template.optimizeSSR && !options.isWebComponent ? createInjector : ''}
   /* style inject SSR */
   ${hasStyle && compiler.template.optimizeSSR ? createInjectorSSR : ''}
+  /* style inject shadow dom */
+  ${hasStyle && options.isWebComponent ? createInjectorShadow : ''}
 
   `
 
@@ -403,6 +452,7 @@ export function assembleFromSource(
     __vue_scope_id__,
     __vue_is_functional_template__,
     __vue_module_identifier__,
+    ${options.isWebComponent ? 'true' : 'false'},
     ${
       code.indexOf('__vue_create_injector__') > -1
         ? '__vue_create_injector__'
@@ -411,6 +461,11 @@ export function assembleFromSource(
     ${
       code.indexOf('__vue_create_injector_ssr__') > -1
         ? '__vue_create_injector_ssr__'
+        : 'undefined'
+    },
+    ${
+      code.indexOf('__vue_create_injector_shadow__') > -1
+        ? '__vue_create_injector_shadow__'
         : 'undefined'
     }
   )`
