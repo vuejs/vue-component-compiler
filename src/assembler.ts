@@ -17,6 +17,12 @@ export interface AssembleSource {
     moduleName?: string
     module?: any
   }>
+  customBlocks: Array<{
+    type: string
+    source: string
+    lang?: string
+    map?: any
+  }>
   scopeId: string
 }
 
@@ -64,6 +70,14 @@ export function assemble(
         moduleName: style.moduleName,
         module: style.module
       }
+    }),
+    customBlocks: result.customBlocks.map(block => {
+      return {
+        type: block.type,
+        source: block.content,
+        lang: block.lang,
+        map: block.map
+      }
     })
   })
 }
@@ -71,7 +85,7 @@ export function assemble(
 export function assembleFromSource(
   compiler: SFCCompiler,
   options: AssembleOptions,
-  { filename, script, template, styles, scopeId }: AssembleSource
+  { filename, script, template, styles, customBlocks, scopeId }: AssembleSource
 ): AssembleResults {
   script = script || { source: 'export default {}' }
   template = template || { source: '' }
@@ -441,7 +455,7 @@ export function assembleFromSource(
   }
 
   code += `
-  export default __vue_normalize__(
+  const Component = __vue_normalize__(
     ${
       code.indexOf('__vue_render__') > -1
         ? '{ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }'
@@ -468,7 +482,12 @@ export function assembleFromSource(
         ? '__vue_create_injector_shadow__'
         : 'undefined'
     }
-  )`
+  )
+  
+  /* custom blocks */
+  ${customBlocks.map(block => block.source).join('\n')}
+
+  export default Component`
 
   if (script.map) {
     map = merge(script.map, JSON.parse(mapGenerator.toString()))
