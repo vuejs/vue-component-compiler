@@ -17,6 +17,7 @@ interface Options {
   script?: ScriptOptions
   style?: StyleOptions
   template?: TemplateOptions
+  customBlock?: CustomBlockOptions
 }
 
 interface ScriptOptions {
@@ -47,7 +48,7 @@ interface CustomBlockTransformerResult {
   map?: any
 }
 
-type CustomBlockTransformer = (content: string, map?: any) => CustomBlockTransformerResult
+type CustomBlockTransformer = (content: string, index: number, map?: any) => CustomBlockTransformerResult
 
 interface CustomBlockOptions {
   transformers?: { [block: string]: CustomBlockTransformer }
