@@ -2,23 +2,27 @@ import {
   SFCCompiler,
   StyleOptions,
   TemplateOptions,
-  ScriptOptions
+  ScriptOptions,
+  CustomBlockOptions
 } from './compiler'
 
 export const createCompiler = ({
   script,
   style,
-  template
+  template,
+  customBlock
 }: {
   script: ScriptOptions
   style: StyleOptions
   template: TemplateOptions
-}) => new SFCCompiler(script, style, template)
+  customBlock: CustomBlockOptions
+}) => new SFCCompiler(script, style, template, customBlock)
 
 export const createDefaultCompiler = (options: {
   script?: ScriptOptions
   style?: StyleOptions
   template?: TemplateOptions
+  customBlock?: CustomBlockOptions
 } = {}) =>
   createCompiler({
     script: { ...options.script },
@@ -29,7 +33,8 @@ export const createDefaultCompiler = (options: {
       isProduction: process.env.NODE_ENV === 'production',
       optimizeSSR: process.env.VUE_ENV === 'server',
       ...options.template
-    }
+    },
+    customBlock: { ...options.customBlock }
   })
 
 export * from './compiler'

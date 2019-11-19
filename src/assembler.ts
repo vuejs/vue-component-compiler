@@ -19,8 +19,7 @@ export interface AssembleSource {
   }>
   customBlocks: Array<{
     type: string
-    source: string
-    lang?: string
+    source?: string
     map?: any
   }>
   scopeId: string
@@ -74,8 +73,7 @@ export function assemble(
     customBlocks: result.customBlocks.map(block => {
       return {
         type: block.type,
-        source: block.content,
-        lang: block.lang,
+        source: block.code,
         map: block.map
       }
     })

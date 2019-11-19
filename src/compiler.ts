@@ -4,6 +4,7 @@ import {
   compileStyle,
   compileStyleAsync,
   SFCBlock,
+  SFCCustomBlock,
   StyleCompileResults,
   TemplateCompileResult,
   StyleCompileOptions
@@ -45,6 +46,17 @@ export interface ScriptOptions {
   preprocessorOptions?: any
 }
 
+export interface CustomBlockTransformerResult {
+  code: string
+  map?: any
+}
+
+export type CustomBlockTransformer = (content: string, map?: any) => CustomBlockTransformerResult
+
+export interface CustomBlockOptions {
+  transformers?: { [block: string]: CustomBlockTransformer }
+}
+
 export interface CompileResult {
   code: string
   map?: any
@@ -56,8 +68,18 @@ export type StyleCompileResult = StyleCompileResults & {
   module?: any
 }
 
+export interface CustomBlockResult {
+  type: string
+  code?: string
+  source: string
+  map?: any
+  attrs: {
+    [key: string]: string | true
+  }
+}
+
 export interface DescriptorCompileResult {
-  customBlocks: SFCBlock[]
+  customBlocks: CustomBlockResult[]
   scopeId: string
   script?: CompileResult
   styles: StyleCompileResult[]
@@ -68,17 +90,20 @@ export class SFCCompiler {
   script: ScriptOptions
   style: StyleOptions
   template: TemplateOptions
+  customBlock: CustomBlockOptions
   resolve: RequireResolve
 
   constructor(
     script: ScriptOptions,
     style: StyleOptions,
     template: TemplateOptions,
+    customBlock: CustomBlockOptions = {},
     resolve: RequireResolve = require.resolve
   ) {
     this.template = template
     this.style = style
     this.script = script
+    this.customBlock = customBlock
     this.resolve = resolve
   }
 
@@ -107,7 +132,7 @@ export class SFCCompiler {
       this.compileStyle(filename, scopeId, style)
     )
 
-    const { script: rawScript, customBlocks } = descriptor
+    const { script: rawScript, customBlocks: rawCustomBlocks } = descriptor
     const script = rawScript
       ? {
           code: rawScript.src
@@ -116,6 +141,7 @@ export class SFCCompiler {
           map: rawScript.map
         }
       : undefined
+    const customBlocks = rawCustomBlocks.map(rawBlock => this.compileCustomBlock(rawBlock))
 
     return {
       scopeId,
@@ -153,7 +179,7 @@ export class SFCCompiler {
       )
     )
 
-    const { script: rawScript, customBlocks } = descriptor
+    const { script: rawScript, customBlocks: rawCustomBlocks } = descriptor
     const script = rawScript
       ? {
           code: rawScript.src
@@ -162,6 +188,7 @@ export class SFCCompiler {
           map: rawScript.map
         }
       : undefined
+    const customBlocks = rawCustomBlocks.map(rawBlock => this.compileCustomBlock(rawBlock))
 
     return {
       scopeId,
@@ -216,6 +243,18 @@ export class SFCCompiler {
     const { options, prepare } = this.doCompileStyle(filename, scopeId, style)
 
     return prepare(await compileStyleAsync(options))
+  }
+
+  compileCustomBlock(
+    block: SFCCustomBlock 
+  ): CustomBlockResult {
+    const result = { type: block.type, source: block.content, attrs: block.attrs }
+    if (!this.customBlock.transformers || !this.customBlock.transformers[block.type]) {
+      return result
+    } else {
+      const transformer = this.customBlock.transformers[block.type]
+      return { ...result, ...transformer(block.content, block.map) }
+    }
   }
 
   private doCompileStyle(

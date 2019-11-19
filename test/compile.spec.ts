@@ -35,10 +35,37 @@ export default {
   color: red;
 }
 </style>
+
+<documentation>
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+</documentation>
+
+<i18n lang="json" locale="ja">
+{
+  "msg": "hi!"
+}
+</i18n>
 `
 
 it('should compile to descriptor', () => {
-  const compiler = createDefaultCompiler()
+  const compiler = createDefaultCompiler({
+    customBlock: {
+      transformers: {
+        i18n: (content, map) => {
+          const value = JSON.stringify(JSON.parse(content))
+            .replace(/\u2028/g, '\\u2028')
+            .replace(/\u2029/g, '\\u2029')
+            .replace(/\\/g, '\\\\')
+          const code = `const resource = ${value.replace(/\u0027/g, '\\u0027')}`
+          return { code, map }
+        }
+      }
+    }
+  })
   const result = compiler.compileToDescriptor('foo.vue', source)
 
   expect(removeRawResult(result)).toMatchSnapshot()

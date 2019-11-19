@@ -41,6 +41,17 @@ interface TemplateOptions {
   isProduction?: boolean
   optimizeSSR?: boolean
 }
+
+interface CustomBlockTransformerResult {
+  code: string
+  map?: any
+}
+
+type CustomBlockTransformer = (content: string, map?: any) => CustomBlockTransformerResult
+
+interface CustomBlockOptions {
+  transformers?: { [block: string]: CustomBlockTransformer }
+}
 ```
 
 ### SFCCompiler.compileToDescriptor(filename: string, source: string): DescriptorCompileResult
@@ -49,7 +60,7 @@ Takes raw source and compiles each block separately. Internally, it uses [compil
 
 ```typescript
 interface DescriptorCompileResult {
-  customBlocks: SFCBlock[]
+  customBlocks: CustomBlockResult[]
   scopeId: string
   script?: CompileResult
   styles: StyleCompileResult[]
@@ -76,6 +87,16 @@ interface TemplateCompileResult {
   tips: string[];
   errors: string[];
   functional: boolean;
+}
+
+export type CustomBlockResult = {
+  type: string
+  code?: string
+  source: string
+  map?: any
+  attrs: {
+    [key: string]: string | true
+  }
 }
 ```
 

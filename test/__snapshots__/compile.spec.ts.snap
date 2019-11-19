@@ -2,8 +2,78 @@
 
 exports[`should compile to descriptor (async) 1`] = `
 Object {
-  "customBlocks": Array [],
-  "scopeId": "data-v-01ebe570",
+  "customBlocks": Array [
+    Object {
+      "attrs": Object {},
+      "source": "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+",
+      "type": "documentation",
+    },
+    Object {
+      "attrs": Object {
+        "lang": "json",
+        "locale": "ja",
+      },
+      "source": "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  \\"msg\\": \\"hi!\\"
+}
+",
+      "type": "i18n",
+    },
+  ],
+  "scopeId": "data-v-744d8fb6",
   "script": Object {
     "code": "//
 //
@@ -44,6 +114,20 @@ export default {
   color: red;
 }
 </style>
+
+<documentation>
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+</documentation>
+
+<i18n lang=\\"json\\" locale=\\"ja\\">
+{
+  \\"msg\\": \\"hi!\\"
+}
+</i18n>
 ",
       ],
       "version": 3,
@@ -83,6 +167,20 @@ export default {
   color: red;
 }
 </style>
+
+<documentation>
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+</documentation>
+
+<i18n lang=\\"json\\" locale=\\"ja\\">
+{
+  \\"msg\\": \\"hi!\\"
+}
+</i18n>
 ",
         ],
         "version": 3,
@@ -117,8 +215,80 @@ render._withStripped = true
 
 exports[`should compile to descriptor 1`] = `
 Object {
-  "customBlocks": Array [],
-  "scopeId": "data-v-01ebe570",
+  "customBlocks": Array [
+    Object {
+      "attrs": Object {},
+      "source": "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+",
+      "type": "documentation",
+    },
+    Object {
+      "attrs": Object {
+        "lang": "json",
+        "locale": "ja",
+      },
+      "code": "const resource = {\\"msg\\":\\"hi!\\"}",
+      "map": undefined,
+      "source": "
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  \\"msg\\": \\"hi!\\"
+}
+",
+      "type": "i18n",
+    },
+  ],
+  "scopeId": "data-v-744d8fb6",
   "script": Object {
     "code": "//
 //
@@ -159,6 +329,20 @@ export default {
   color: red;
 }
 </style>
+
+<documentation>
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+</documentation>
+
+<i18n lang=\\"json\\" locale=\\"ja\\">
+{
+  \\"msg\\": \\"hi!\\"
+}
+</i18n>
 ",
       ],
       "version": 3,
@@ -198,6 +382,20 @@ export default {
   color: red;
 }
 </style>
+
+<documentation>
+# @vue/component-compiler
+
+> High level utilities for compiling Vue single file components
+
+This package contains high level utilities that you can use if you are writing a plugin / transform for a bundler or module.
+</documentation>
+
+<i18n lang=\\"json\\" locale=\\"ja\\">
+{
+  \\"msg\\": \\"hi!\\"
+}
+</i18n>
 ",
         ],
         "version": 3,

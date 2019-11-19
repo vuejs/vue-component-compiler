@@ -4,7 +4,15 @@ const fs = require('fs')
 const path = require('path')
 const { createDefaultCompiler, assemble } = require('../..')
 
-const compiler = createDefaultCompiler()
+const compiler = createDefaultCompiler({
+  customBlock: {
+    transformers: {
+      documentation: (source, map) => {
+        return { code: `/** ${source} **/`, map }
+      }
+    }
+  }
+})
 function compile(filename, source) {
   return assemble(
     compiler,

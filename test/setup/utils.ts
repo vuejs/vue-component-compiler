@@ -48,6 +48,14 @@ const compiler = createCompiler({
     compilerOptions: {},
     isProduction: process.env.NODE_ENV === 'production',
     optimizeSSR: process.env.VUE_ENV === 'server'
+  },
+  customBlock: {
+    transformers: {
+      documentation: (source, map) => {
+        const code = `/** ${source} **/`
+        return { code, map }
+      }
+    }
   }
 })
 function compile(filename, source) {
