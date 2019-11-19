@@ -251,7 +251,7 @@ This package contains high level utilities that you can use if you are writing a
         "lang": "json",
         "locale": "ja",
       },
-      "code": "const resource = {\\"msg\\":\\"hi!\\"}",
+      "code": "const resource1 = {\\"msg\\":\\"hi!\\"}",
       "map": undefined,
       "source": "
 

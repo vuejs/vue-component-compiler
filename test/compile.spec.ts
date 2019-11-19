@@ -55,12 +55,12 @@ it('should compile to descriptor', () => {
   const compiler = createDefaultCompiler({
     customBlock: {
       transformers: {
-        i18n: (content, map) => {
+        i18n: (content, index, map) => {
           const value = JSON.stringify(JSON.parse(content))
             .replace(/\u2028/g, '\\u2028')
             .replace(/\u2029/g, '\\u2029')
             .replace(/\\/g, '\\\\')
-          const code = `const resource = ${value.replace(/\u0027/g, '\\u0027')}`
+          const code = `const resource${index} = ${value.replace(/\u0027/g, '\\u0027')}`
           return { code, map }
         }
       }

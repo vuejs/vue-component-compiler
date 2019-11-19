@@ -7,7 +7,7 @@ const { createDefaultCompiler, assemble } = require('../..')
 const compiler = createDefaultCompiler({
   customBlock: {
     transformers: {
-      documentation: (source, map) => {
+      documentation: (source, index, map) => {
         return { code: `/** ${source} **/`, map }
       }
     }
