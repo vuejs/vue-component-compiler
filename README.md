@@ -48,7 +48,7 @@ interface CustomBlockTransformerResult {
   map?: any
 }
 
-type CustomBlockTransformer = (content: string, index: number, map?: any) => CustomBlockTransformerResult
+type CustomBlockTransformer = (block: SFCCustomBlock, index: number) => CustomBlockTransformerResult
 
 interface CustomBlockOptions {
   transformers?: { [block: string]: CustomBlockTransformer }

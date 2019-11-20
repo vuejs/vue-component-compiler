@@ -42,8 +42,7 @@ it('should included source of custom blocks', () => {
         `  import block1 from 'foo.vue?rollup-plugin-vue=customBlocks.1.json'`,
         `  if (typeof block1 === 'function') block1(Component)`
       ].join('\n'),
-      type: 'i18n',
-      lang: 'json'
+      type: 'i18n'
     }]
   })
   expect(result.code).toMatchSnapshot()

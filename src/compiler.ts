@@ -51,7 +51,7 @@ export interface CustomBlockTransformerResult {
   map?: any
 }
 
-export type CustomBlockTransformer = (content: string, index: number, map?: any) => CustomBlockTransformerResult
+export type CustomBlockTransformer = (block: SFCCustomBlock, index: number) => CustomBlockTransformerResult
 
 export interface CustomBlockOptions {
   transformers?: { [block: string]: CustomBlockTransformer }
@@ -254,7 +254,7 @@ export class SFCCompiler {
       return result
     } else {
       const transformer = this.customBlock.transformers[block.type]
-      return { ...result, ...transformer(block.content, index, block.map) }
+      return { ...result, ...transformer(block, index) }
     }
   }
 
