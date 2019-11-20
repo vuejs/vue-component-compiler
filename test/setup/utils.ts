@@ -51,8 +51,8 @@ const compiler = createCompiler({
   },
   customBlock: {
     transformers: {
-      documentation: (source, index, map) => {
-        const code = `/** ${source} **/`
+      documentation: ({ content, map }, index) => {
+        const code = `/** ${content} **/`
         return { code, map }
       }
     }
