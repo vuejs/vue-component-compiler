@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.0"></a>
+# [4.2.0](https://github.com/vuejs/vue-component-compiler/compare/v4.1.0...v4.2.0) (2019-11-21)
+
+
+### Features
+
+* use __vue_component__ identifier for normalized component and default export ([#91](https://github.com/vuejs/vue-component-compiler/issues/91)) ([fb1ab41](https://github.com/vuejs/vue-component-compiler/commit/fb1ab41))
+
+
+
 <a name="4.1.0"></a>
 # [4.1.0](https://github.com/vuejs/vue-component-compiler/compare/v4.0.0...v4.1.0) (2019-10-26)
 
