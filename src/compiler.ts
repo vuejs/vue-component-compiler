@@ -51,7 +51,7 @@ export interface CustomBlockTransformerResult {
   map?: any
 }
 
-export type CustomBlockTransformer = (block: SFCCustomBlock, index: number) => CustomBlockTransformerResult
+export type CustomBlockTransformer = (block: SFCCustomBlock, filename: string, index: number) => CustomBlockTransformerResult
 
 export interface CustomBlockOptions {
   transformers?: { [block: string]: CustomBlockTransformer }
@@ -141,7 +141,8 @@ export class SFCCompiler {
           map: rawScript.map
         }
       : undefined
-    const customBlocks = rawCustomBlocks.map((rawBlock, index) => this.compileCustomBlock(rawBlock, index))
+    const customBlocks = rawCustomBlocks
+      .map((rawBlock, index) => this.compileCustomBlock(filename, rawBlock, index))
 
     return {
       scopeId,
@@ -188,7 +189,8 @@ export class SFCCompiler {
           map: rawScript.map
         }
       : undefined
-    const customBlocks = rawCustomBlocks.map((rawBlock, index) => this.compileCustomBlock(rawBlock, index))
+    const customBlocks = rawCustomBlocks
+    .map((rawBlock, index) => this.compileCustomBlock(filename, rawBlock, index))
 
     return {
       scopeId,
@@ -246,6 +248,7 @@ export class SFCCompiler {
   }
 
   compileCustomBlock(
+    filename: string,
     block: SFCCustomBlock,
     index: number
   ): CustomBlockResult {
@@ -254,7 +257,7 @@ export class SFCCompiler {
       return result
     } else {
       const transformer = this.customBlock.transformers[block.type]
-      return { ...result, ...transformer(block, index) }
+      return { ...result, ...transformer(block, filename, index) }
     }
   }
 

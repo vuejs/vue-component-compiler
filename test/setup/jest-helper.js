@@ -7,8 +7,12 @@ const { createDefaultCompiler, assemble } = require('../..')
 const compiler = createDefaultCompiler({
   customBlock: {
     transformers: {
-      documentation: ({ content, map }, index) => {
-        return { code: `/** ${content} **/`, map }
+      documentation: ({ map }, filename, index) => {
+        const code = `
+        import block${index} from '${filename}?rollup-plugin-vue=customBlocks.0.documentation'
+        if (typeof block${index} === 'function') block${index}(Component)
+        `,
+        return { code, map }
       }
     }
   }

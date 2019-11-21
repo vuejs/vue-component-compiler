@@ -55,7 +55,7 @@ it('should compile to descriptor', () => {
   const compiler = createDefaultCompiler({
     customBlock: {
       transformers: {
-        i18n: ({ content, map }, index) => {
+        i18n: ({ content, map }, filename, index) => {
           const value = JSON.stringify(JSON.parse(content))
             .replace(/\u2028/g, '\\u2028')
             .replace(/\u2029/g, '\\u2029')

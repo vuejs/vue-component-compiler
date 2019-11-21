@@ -111,10 +111,8 @@ exports[`should included source of custom blocks 1`] = `
   )
   
   /* custom blocks */
-  export * from 'foo.vue?rollup-plugin-vue=customBlocks.0.i18n'
   import block0 from 'foo.vue?rollup-plugin-vue=customBlocks.0.i18n'
   if (typeof block0 === 'function') block0(Component)
-  export * from 'foo.vue?rollup-plugin-vue=customBlocks.1.json'
   import block1 from 'foo.vue?rollup-plugin-vue=customBlocks.1.json'
   if (typeof block1 === 'function') block1(Component)
 

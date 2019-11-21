@@ -31,14 +31,12 @@ it('should included source of custom blocks', () => {
     styles: [],
     customBlocks: [{
       source: [
-        `export * from 'foo.vue?rollup-plugin-vue=customBlocks.0.i18n'`,
-        `  import block0 from 'foo.vue?rollup-plugin-vue=customBlocks.0.i18n'`,
+        `import block0 from 'foo.vue?rollup-plugin-vue=customBlocks.0.i18n'`,
         `  if (typeof block0 === 'function') block0(Component)`
       ].join('\n'),
       type: 'i18n'
     }, {
       source: [
-        `  export * from 'foo.vue?rollup-plugin-vue=customBlocks.1.json'`,
         `  import block1 from 'foo.vue?rollup-plugin-vue=customBlocks.1.json'`,
         `  if (typeof block1 === 'function') block1(Component)`
       ].join('\n'),

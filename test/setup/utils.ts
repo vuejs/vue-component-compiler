@@ -20,12 +20,16 @@ function vue() {
 function inline(filename, code) {
   return {
     name: 'Inline',
-    resolveId(id) {
+    resolveId(id, importer) {
       if (id === filename) return filename
+      if (id.endsWith('.documentation')) return id
     },
     load(id) {
       if (id === filename) {
         return code
+      }
+      if (id.endsWith('.documentation')) {
+        return `export default { name: "foo" }`
       }
     }
   }
@@ -51,8 +55,11 @@ const compiler = createCompiler({
   },
   customBlock: {
     transformers: {
-      documentation: ({ content, map }, index) => {
-        const code = `/** ${content} **/`
+      documentation: ({ map }, filename, index) => {
+        const code = `
+        import block${index} from '${filename}?rollup-plugin-vue=customBlocks.0.documentation'
+        if (typeof block${index} === 'function') block${index}(Component)
+        `
         return { code, map }
       }
     }
