@@ -441,7 +441,7 @@ export function assembleFromSource(
   }
 
   code += `
-  export default __vue_normalize__(
+  const __vue_component__ = __vue_normalize__(
     ${
       code.indexOf('__vue_render__') > -1
         ? '{ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }'
@@ -468,7 +468,8 @@ export function assembleFromSource(
         ? '__vue_create_injector_shadow__'
         : 'undefined'
     }
-  )`
+  )\n
+  export default __vue_component__`
 
   if (script.map) {
     map = merge(script.map, JSON.parse(mapGenerator.toString()))
