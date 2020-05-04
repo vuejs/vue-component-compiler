@@ -441,7 +441,7 @@ export function assembleFromSource(
   }
 
   code += `
-  const __vue_component__ = __vue_normalize__(
+  const __vue_component__ = /*#__PURE__*/__vue_normalize__(
     ${
       code.indexOf('__vue_render__') > -1
         ? '{ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }'
