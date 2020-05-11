@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.1"></a>
+## [4.2.1](https://github.com/vuejs/vue-component-compiler/compare/v4.2.0...v4.2.1) (2020-05-11)
+
+
+### Bug Fixes
+
+* add pure annotation for tree shaking support ([#96](https://github.com/vuejs/vue-component-compiler/issues/96)) ([7b4dceb](https://github.com/vuejs/vue-component-compiler/commit/7b4dceb))
+
+
+
 <a name="4.2.0"></a>
 # [4.2.0](https://github.com/vuejs/vue-component-compiler/compare/v4.1.0...v4.2.0) (2019-11-21)
 
