@@ -90,7 +90,6 @@ export function assembleFromSource(
 
   // language=JavaScript
   const inlineCreateInjector = `function __vue_create_injector__() {
-    const head = document.head || document.getElementsByTagName('head')[0]
     const styles = __vue_create_injector__.styles || (__vue_create_injector__.styles = {})
     const isOldIE =
       typeof navigator !== 'undefined' &&
@@ -124,6 +123,7 @@ export function assembleFromSource(
         }
 
         if (!style.element) {
+          const head = document.head || document.getElementsByTagName('head')[0]
           const el = style.element = document.createElement('style')
           el.type = 'text/css'
 
