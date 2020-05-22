@@ -1,5 +1,7 @@
 import * as postcss from 'postcss'
-import CleanCSS from 'clean-css'
+// ESM import of clean-css breaks test/runtime check this fix for reference:
+// https://github.com/vuejs/vue-component-compiler/pull/103#issuecomment-632676899
+const CleanCSS = require('clean-css')
 
 export default postcss.plugin('clean', (options: any) => {
   const clean = new CleanCSS({ compatibility: 'ie9', ...options })
