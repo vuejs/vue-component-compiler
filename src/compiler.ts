@@ -246,7 +246,7 @@ export class SFCCompiler {
           : undefined,
       ])
       .filter(Boolean)
-    
+
     const preprocessOptions =
       (style.lang &&
         this.style.preprocessOptions &&

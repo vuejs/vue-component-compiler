@@ -1,7 +1,7 @@
 import * as postcss from 'postcss'
 import CleanCSS = require('clean-css')
 
-export default postcss.plugin('clean', options => {
+export default postcss.plugin('clean', (options: any) => {
   const clean = new CleanCSS({ compatibility: 'ie9', ...options })
 
   return (css: any, res: any) => {

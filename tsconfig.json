@@ -13,7 +13,8 @@
     "strictNullChecks": true,
     "noImplicitAny": true,
     "removeComments": false,
-    "lib": ["es6", "es7"]
+    "lib": ["es6", "es7"],
+    "types": ["@types/jest", "node"]
   },
   "include": ["src", "typings"]
 }
