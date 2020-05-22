@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.2"></a>
+## [4.2.2](https://github.com/vuejs/vue-component-compiler/compare/v4.2.1...v4.2.2) (2020-05-22)
+
+
+### Bug Fixes
+
+* produce deterministic css class names for css modules ([#101](https://github.com/vuejs/vue-component-compiler/issues/101)) ([b8bfc58](https://github.com/vuejs/vue-component-compiler/commit/b8bfc58))
+
+
+
 <a name="4.2.1"></a>
 ## [4.2.1](https://github.com/vuejs/vue-component-compiler/compare/v4.2.0...v4.2.1) (2020-05-11)
 
