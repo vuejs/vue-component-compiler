@@ -60,3 +60,64 @@ function removeRawResult(result: DescriptorCompileResult): DescriptorCompileResu
 
   return result
 }
+
+describe('when source contains css module', () => {
+  const componentSource = `
+    <template>
+      <h1 id="test" :class="$style.title">Hello {{ name }}!</h1>
+    </template>
+
+    <script>
+    export default {
+      data () {
+        return { name: 'John Doe' }
+      }
+    }
+    </script>
+
+    <style module>
+    .title {
+      color: red;
+    }
+    </style>
+    `
+
+
+  describe('production mode', () => {
+    const prodCompiler = createDefaultCompiler(({
+      template: {
+        isProduction: true
+      }
+    }) as any)
+
+    it('should generate deterministic class names when the same component is compiled multiple times', () => {
+
+      const result1 = prodCompiler.compileToDescriptor('foo.vue', componentSource)
+      const result2 = prodCompiler.compileToDescriptor('foo.vue', componentSource)
+
+      const styles1 = result1.styles[0].code;
+      const styles2 = result2.styles[0].code;
+
+      expect(styles1).toEqual(styles2)
+    })
+  })
+
+  describe('develop mode', () => {
+    const devCompiler = createDefaultCompiler(({
+      template: {
+        isProduction: false
+      }
+    }) as any)
+
+    it('should generate deterministic class names when the same component is compiled multiple times', () => {
+
+      const result1 = devCompiler.compileToDescriptor('foo.vue', componentSource)
+      const result2 = devCompiler.compileToDescriptor('foo.vue', componentSource)
+
+      const styles1 = result1.styles[0].code;
+      const styles2 = result2.styles[0].code;
+
+      expect(styles1).toEqual(styles2)
+    })
+  })
+})

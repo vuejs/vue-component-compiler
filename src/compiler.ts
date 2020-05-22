@@ -232,9 +232,6 @@ export class SFCCompiler {
     const postcssPlugins = (this.style.postcssPlugins || [])
       .slice()
       .concat([
-        needsCleanCSS
-          ? postcssClean(this.style.postcssCleanOptions)
-          : undefined,
         needsCSSModules
           ? postcssModules({
               generateScopedName: '[path][local]-[hash:base64:4]',
@@ -243,6 +240,9 @@ export class SFCCompiler {
                 tokens = t
               }
             })
+          : undefined,
+        needsCleanCSS
+          ? postcssClean(this.style.postcssCleanOptions)
           : undefined,
       ])
       .filter(Boolean)
