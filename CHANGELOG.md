@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.3"></a>
+## [4.2.3](https://github.com/vuejs/vue-component-compiler/compare/v4.2.2...v4.2.3) (2020-05-22)
+
+
+### Bug Fixes
+
+* set correct clean-css import ([#103](https://github.com/vuejs/vue-component-compiler/issues/103)) ([b1aff3f](https://github.com/vuejs/vue-component-compiler/commit/b1aff3f))
+
+
+
 <a name="4.2.2"></a>
 ## [4.2.2](https://github.com/vuejs/vue-component-compiler/compare/v4.2.1...v4.2.2) (2020-05-22)
 
