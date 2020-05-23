@@ -1,29 +1,32 @@
 import { rollup } from 'rollup'
-import babel from 'rollup-plugin-babel'
-import commonjs from 'rollup-plugin-commonjs'
-import nodeResolve from 'rollup-plugin-node-resolve'
-import image from 'rollup-plugin-image'
+import babel from '@rollup/plugin-babel'
+import nodeResolve from '@rollup/plugin-node-resolve'
+const commonjs = require('@rollup/plugin-commonjs');
+const image = require('@rollup/plugin-image');
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import { Browser } from "puppeteer";
+import { createCompiler, assemble } from '../..'
+import { AssembleResults } from "../../src";
 
 export { compile, build, open, pack }
 
 function vue() {
   return {
     name: 'vue',
-    transform(code, id) {
+    transform(code: string, id: string) {
       if (id.endsWith('.vue')) return compile(id, code)
     }
   }
 }
 
-function inline(filename, code) {
+function inline(filename: string, code: string | AssembleResults) {
   return {
     name: 'Inline',
-    resolveId(id) {
+    resolveId(id: string) {
       if (id === filename) return filename
     },
-    load(id) {
+    load(id: string) {
       if (id === filename) {
         return code
       }
@@ -31,15 +34,15 @@ function inline(filename, code) {
   }
 }
 
-function load(ext, handle) {
+function load(ext: string, handle: (T: string) => string) {
   return {
     name: 'load' + ext,
-    load(id) {
-      if (id.endsWith(ext)) return handle(id.split(':').pop())
+    load(id: string) {
+      if (id.endsWith(ext)) return handle(id.split(':').pop()!)
     }
   }
 }
-import { createCompiler, assemble } from '../..'
+
 const compiler = createCompiler({
   script: {},
   style: { trim: true },
@@ -50,7 +53,7 @@ const compiler = createCompiler({
     optimizeSSR: process.env.VUE_ENV === 'server'
   }
 })
-function compile(filename, source) {
+function compile(filename: string, source: string) {
   const result = compiler.compileToDescriptor(filename, source)
 
   result.styles.forEach(style => {
@@ -61,13 +64,13 @@ function compile(filename, source) {
 }
 
 const babelit = babel({
-  presets: [[require.resolve('babel-preset-env'), { modules: false }]],
-  plugins: ['external-helpers'],
+  presets: [[require.resolve('@babel/preset-env'), { modules: false }]],
+  plugins: ["@babel/plugin-transform-runtime"],
   babelrc: false,
-  runtimeHelpers: true
+  babelHelpers: 'runtime',
 })
 
-async function pack(filename, source) {
+async function pack(filename: string, source: string) {
   const name = filename + '__temp.js'
   let bundle = await rollup(<any>{
     input: name,
@@ -78,23 +81,23 @@ async function pack(filename, source) {
     plugins: [
       load(
         '.png',
-        id =>
+        (id) =>
           `export default "data:image/png;base64,${readFileSync(
             id,
             'base64'
           )}"\n`
       ),
-      inline(name, (await bundle.generate({ format: 'cjs' })).code),
+      inline(name, (await bundle.generate({ format: 'cjs' })).output[0].code),
       commonjs(),
       babelit
     ]
   })
 
-  return (await bundle.generate({ format: 'cjs' })).code
+  return (await bundle.generate({ format: 'cjs' })).output[0].code
 }
 
-const cache = {}
-async function build(filename) {
+const cache: Record<string, string> = {}
+async function build(filename: string) {
   if (filename in cache) return cache[filename]
   const source = compile(filename, readFileSync(filename).toString())
   const component = filename + '__.js'
@@ -134,7 +137,7 @@ async function build(filename) {
       vue(),
       image(),
       commonjs(),
-      inline(component, generated.code),
+      inline(component, generated.output[0].code),
       babelit
     ]
   })
@@ -142,7 +145,7 @@ async function build(filename) {
   cache[filename] = (await bundle.generate({
     format: 'iife',
     name: 'App'
-  })).code
+  })).output[0].code
 
   return cache[filename]
 }
@@ -151,7 +154,7 @@ const vueSource = readFileSync(
   resolve(__dirname, '../../node_modules/vue/dist/vue.min.js')
 ).toString()
 const escape = (any: string) => any.replace(/<\//g, '&lt;\/')
-async function open(name, browser, code, id = '#test') {
+async function open(name: string, browser: Browser, code: string, id = '#test') {
   const page = await browser.newPage()
 
   const content = `
