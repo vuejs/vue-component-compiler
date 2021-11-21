@@ -47,6 +47,7 @@ export interface ScriptOptions {
 
 export interface CompileResult {
   code: string
+  lang?: string
   map?: any
 }
 export type StyleCompileResult = StyleCompileResults & {
@@ -113,7 +114,8 @@ export class SFCCompiler {
           code: rawScript.src
             ? this.read(rawScript.src, filename)
             : rawScript.content,
-          map: rawScript.map
+          map: rawScript.map,
+          lang: rawScript.lang
         }
       : undefined
 
@@ -159,7 +161,8 @@ export class SFCCompiler {
           code: rawScript.src
             ? this.read(rawScript.src, filename)
             : rawScript.content,
-          map: rawScript.map
+          map: rawScript.map,
+          lang: rawScript.lang
         }
       : undefined
 
