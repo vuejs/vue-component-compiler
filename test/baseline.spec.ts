@@ -4,17 +4,25 @@ const { join, resolve } = require('path')
 import { build, open } from './setup/utils'
 
 let browser = null
+let finished = false
 const fixtures = readdirSync(join(__dirname, 'fixtures'))
   .filter(it => it.endsWith('.vue'))
   .map(it => it.replace(/\.vue$/i, ''))
 
-beforeAll(async () => {
+beforeAll(async function setup () {
+  if (finished) {
+    return
+  }
   browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
     headless: Boolean(process.env.CI)
   })
+  browser.on('disconnected', setup);
 })
-afterAll(async () => browser && (await browser.close()))
+afterAll(async () => {
+  finished = true
+  browser && (await browser.close())
+})
 
 fixtures.forEach(it =>
   test(it, async () => {
