@@ -14,7 +14,8 @@
     "noImplicitAny": true,
     "removeComments": false,
     "lib": ["es6", "es7"],
-    "types": ["@types/jest", "node"]
+    "types": ["@types/jest", "node"],
+    "skipLibCheck": true
   },
   "include": ["src", "typings"]
 }
