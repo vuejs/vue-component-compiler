@@ -1,3 +1,7 @@
+> ⚠️ DEPRECATED: please use [@vue/compiler-sfc](https://github.com/vuejs/core/tree/main/packages/compiler-sfc) instead.
+>
+> Vue 2.7 also ships [2.x of `@vue/compiler-sfc`](https://github.com/vuejs/vue/blob/main/packages/compiler-sfc/src/index.ts) with largely compatible API with 3.x.
+
 # @vue/component-compiler [![Build Status](https://circleci.com/gh/vuejs/vue-component-compiler/tree/master.svg?style=shield)](https://circleci.com/gh/vuejs/vue-component-compiler)
 
 > High level utilities for compiling Vue single file components
