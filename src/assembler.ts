@@ -83,7 +83,7 @@ export function assembleFromSource(
   const e = (any: any): string => JSON.stringify(any)
   const createImport = (name: string, value: string) =>
     value.startsWith('~')
-      ? `import ${name} from '${value.substr(1)}'`
+      ? `import ${name} from '${value.slice(1)}'`
       : `const ${name} = ${value}`
   const o = e
   const IDENTIFIER = /^[a-z0-9]+$/i
@@ -423,7 +423,7 @@ export function assembleFromSource(
           generated: { line: index + 2, column: pos }
         })
 
-        if (sourceLine.substr(pos + matches[0].length)) {
+        if (sourceLine.slice(pos + matches[0].length)) {
           mapGenerator.addMapping({
             source: filename,
             original: { line: index + 1, column: pos + matches[0].length },
