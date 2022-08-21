@@ -62,6 +62,7 @@ interface DescriptorCompileResult {
 
 interface CompileResult {
   code: string
+  lang?: string
   map?: any
 }
 

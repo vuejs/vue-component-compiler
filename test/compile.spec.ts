@@ -61,6 +61,34 @@ function removeRawResult(result: DescriptorCompileResult): DescriptorCompileResu
   return result
 }
 
+
+test('detect script lang attribute', () => {
+  const source = `
+    <template>
+      <h1 id="test">Hello {{ name }}!</h1>
+    </template>
+
+    <script lang="ts">
+    export default {
+      data () {
+        return { name: 'John Doe' }
+      }
+    }
+    </script>
+
+    <style>
+    .title {
+      color: red;
+    }
+    </style>
+    `
+
+  const compiler = createDefaultCompiler()
+  const result = compiler.compileToDescriptor('foo.vue', source)
+
+  expect(result.script.lang).toBe('ts')
+})
+
 describe('when source contains css module', () => {
   const componentSource = `
     <template>

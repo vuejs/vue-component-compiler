@@ -17,6 +17,7 @@ export default {
   }
 }
 ",
+    "lang": undefined,
     "map": Object {
       "file": "foo.vue",
       "mappings": ";;;;;;AAMA;AACA;AACA;AACA;AACA",
@@ -132,6 +133,7 @@ export default {
   }
 }
 ",
+    "lang": undefined,
     "map": Object {
       "file": "foo.vue",
       "mappings": ";;;;;;AAMA;AACA;AACA;AACA;AACA",

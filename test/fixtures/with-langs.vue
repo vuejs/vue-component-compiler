@@ -2,7 +2,7 @@
   h1#test.title Hello {{ name }}!
 </template>
 
-<script>
+<script lang="ts">
 export default {
   data () {
     return { name: 'John Doe' }

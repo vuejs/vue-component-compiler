@@ -7,7 +7,7 @@ import * as path from 'path'
 
 export interface AssembleSource {
   filename: string
-  script?: { source: string; map?: any }
+  script?: { source: string; map?: any, lang?: string }
   template?: { source: string; functional?: boolean }
   styles: Array<{
     source: string
@@ -221,14 +221,14 @@ export function assembleFromSource(
       var styleElement = document.createElement('style')
       styleElement.type = 'text/css'
       shadowRoot.appendChild(styleElement)
-    
+
       return styleElement
-    }    
+    }
 
     return function addStyle(id, css) {
       const styleElement = createStyleElement(shadowRoot)
       if (css.media) styleElement.setAttribute('media', css.media)
-      
+
       let code = css.source
 
       if (${e(compiler.template.isProduction)} && css.map) {
@@ -241,7 +241,7 @@ export function assembleFromSource(
           btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) +
           ' */'
       }
-      
+
       if ('styleSheet' in styleElement) {
         styleElement.styleSheet.cssText = code
       } else {
@@ -306,7 +306,7 @@ export function assembleFromSource(
         component._ssrRegister = hook
       }
       else if (style) {
-        hook = shadowMode 
+        hook = shadowMode
           ? function(context) {
               style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot))
             }
